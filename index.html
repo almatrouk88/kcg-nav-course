@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دورة الأجهزة الملاحية — خفر السواحل</title>
+<meta name="theme-color" content="#0b1726">
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Changa:wght@600;800&family=Vazirmatn:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b1726; --bg2:#0f2033; --card:#14293f; --card2:#1a3350;
+    --line:rgba(255,255,255,.12); --ink:#e8f0f8; --dim:#9fb3c8;
+    --amber:#f5a524; --amber2:#ffcf6e; --cyan:#38bdf8; --green:#4ade80;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Vazirmatn","Geeza Pro",Tahoma,sans-serif;line-height:1.75;
+       background-image:radial-gradient(1200px 600px at 80% -10%,rgba(56,189,248,.10),transparent 60%),
+                        radial-gradient(900px 500px at 10% 0%,rgba(245,165,36,.08),transparent 55%);}
+  h1,h2,h3{font-family:"Changa","Geeza Pro",sans-serif;line-height:1.3}
+  .wrap{max-width:1000px;margin:0 auto;padding:clamp(1rem,4vw,2.5rem) 1rem 4rem}
+
+  header{display:flex;align-items:center;gap:1rem;margin-bottom:.4rem}
+  header img{width:clamp(56px,12vw,78px);height:auto;flex:none}
+  header .t .k{color:var(--cyan);font-size:.9rem;font-weight:600}
+  header .t h1{font-size:clamp(1.4rem,5vw,2.2rem);font-weight:800}
+  header .t h1 span{color:var(--amber2)}
+  .lead{color:var(--dim);font-size:clamp(.95rem,2.5vw,1.05rem);margin:.4rem 0 1.6rem;max-width:72ch}
+
+  h2.sec{font-size:clamp(1.15rem,3.6vw,1.45rem);font-weight:800;margin:2.2rem 0 .2rem;display:flex;align-items:center;gap:.55rem}
+  h2.sec i{font-style:normal}
+  h2.sec small{font-family:"Vazirmatn",sans-serif;font-weight:400;font-size:.8rem;color:var(--dim)}
+  .hint{color:var(--dim);font-size:.9rem;margin-bottom:.9rem}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:.9rem}
+  .card{background:linear-gradient(160deg,var(--card),#122236);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;
+        display:flex;flex-direction:column;gap:.55rem;transition:transform .15s ease,border-color .15s ease}
+  .card:hover{transform:translateY(-2px);border-color:rgba(245,165,36,.45)}
+  .card .top{display:flex;align-items:center;gap:.6rem}
+  .card .ico{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;font-size:1.25rem;flex:none;
+              background:rgba(245,165,36,.14);border:1px solid rgba(245,165,36,.3)}
+  .card.blue .ico{background:rgba(56,189,248,.14);border-color:rgba(56,189,248,.32)}
+  .card h3{font-size:1.08rem}
+  .card p{color:var(--dim);font-size:.9rem;flex:1}
+  .meta{display:flex;flex-wrap:wrap;gap:.35rem}
+  .meta span{font-size:.75rem;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:.05rem .55rem}
+  .btns{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.2rem}
+  a.btn{display:inline-flex;align-items:center;gap:.35rem;text-decoration:none;font-size:.88rem;font-weight:600;
+        padding:.42rem .85rem;border-radius:10px;border:1px solid var(--line);color:var(--ink);background:rgba(255,255,255,.04)}
+  a.btn:hover{background:rgba(255,255,255,.09)}
+  a.btn.go{background:linear-gradient(135deg,var(--amber),#d98a10);border-color:transparent;color:#17120a}
+  a.btn.go:hover{filter:brightness(1.08)}
+  a.btn.cy{border-color:rgba(56,189,248,.45);color:var(--cyan)}
+
+  .card.soon{opacity:.55;border-style:dashed}
+  .card.soon .ico{background:rgba(255,255,255,.05);border-color:var(--line)}
+
+  .note{margin-top:2.2rem;background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.28);border-radius:14px;padding:.85rem 1.1rem;font-size:.92rem;color:var(--dim)}
+  .note b{color:var(--cyan)}
+  footer{margin-top:2.2rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--dim);font-size:.82rem;text-align:center}
+  @media (max-width:420px){ .grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <img src="logo.png" alt="">
+    <div class="t">
+      <div class="k">قسم الأجهزة الملاحية والرادار — خفر السواحل</div>
+      <h1>دورة تشغيل وصيانة وفك وتركيب <span>الأجهزة الملاحية</span></h1>
+    </div>
+  </header>
+  <p class="lead">كل مواد الدورة في مكان واحد: المذكرة كاملة أو كل قسم على حدة، والعروض التقديمية التفاعلية. تُفتح من أي جهاز (جوال أو كمبيوتر) بدون تسجيل دخول.</p>
+
+  <!-- ═════════ العروض ═════════ -->
+  <h2 class="sec"><i>🖥️</i> العروض التقديمية <small>تفاعلية — تُعرض من المتصفح مباشرة</small></h2>
+  <p class="hint">داخل العرض: الأسهم ← → للتنقل · <b>O</b> نظرة عامة · <b>G</b> الانتقال لشريحة · <b>F</b> ملء الشاشة · <b>P</b> وضع المحاضر.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="top"><div class="ico">📡</div><h3>جهاز الرادار</h3></div>
+      <p>٤١ شريحة مع محاكيات: النبضة، الدوبلكسر، النطاقات، شاشة الرادار، الأعطال الشائعة.</p>
+      <div class="meta"><span>٤١ شريحة</span><span>٦ محاكيات</span></div>
+      <div class="btns"><a class="btn go" href="radar/">▶ افتح العرض</a><a class="btn" href="radar/radar-slides.pdf">PDF</a></div>
+    </div>
+
+    <div class="card">
+      <div class="top"><div class="ico">🛰️</div><h3>جهاز الـ GPS</h3></div>
+      <p>٣٦ شريحة مع محاكيات: التثليث، شاشة الأقمار و HDOP، الدَاتُم، زر MOB، الربط بالـ VHF.</p>
+      <div class="meta"><span>٣٦ شريحة</span><span>٦ محاكيات</span></div>
+      <div class="btns"><a class="btn go" href="gps/">▶ افتح العرض</a><a class="btn" href="gps/gps-slides.pdf">PDF</a></div>
+    </div>
+
+    <div class="card soon">
+      <div class="top"><div class="ico">📻</div><h3>نظام الراديو VHF</h3></div>
+      <p>العرض قيد الإعداد — يُضاف هنا فور جاهزيته.</p>
+      <div class="meta"><span>قريباً</span></div>
+    </div>
+
+    <div class="card soon">
+      <div class="top"><div class="ico">🌊</div><h3>جهاز قياس الأعماق</h3></div>
+      <p>العرض قيد الإعداد — يُضاف هنا فور جاهزيته.</p>
+      <div class="meta"><span>قريباً</span></div>
+    </div>
+
+    <div class="card soon">
+      <div class="top"><div class="ico">📱</div><h3>جهاز النوكيا</h3></div>
+      <p>العرض قيد الإعداد — يُضاف هنا فور جاهزيته.</p>
+      <div class="meta"><span>قريباً</span></div>
+    </div>
+
+  </div>
+
+  <!-- ═════════ المذكرة ═════════ -->
+  <h2 class="sec"><i>📘</i> مذكرة الدورة <small>نسخة 2026 — ١١٢ صفحة</small></h2>
+  <p class="hint">المذكرة كاملة بترقيم متسلسل وفهرس محدَّث، أو كل قسم في ملف مستقل.</p>
+  <div class="grid">
+
+    <div class="card blue">
+      <div class="top"><div class="ico">📘</div><h3>المذكرة كاملة</h3></div>
+      <p>كل الأقسام: VHF · GPS · الرادار · الأعماق · النوكيا، مع الفهرس.</p>
+      <div class="meta"><span>١١٢ صفحة</span><span>PDF</span></div>
+      <div class="btns"><a class="btn go" href="memo/memo-full.pdf">📖 افتح المذكرة</a></div>
+    </div>
+
+    <div class="card blue">
+      <div class="top"><div class="ico">📻</div><h3>قسم VHF</h3></div>
+      <p>نظام الراديو اللاسلكي: الأجزاء، الهوائيات، الترددات، القنوات المهمة، العملي.</p>
+      <div class="meta"><span>صفحات ٤–١٥</span></div>
+      <div class="btns"><a class="btn go" href="memo/section-vhf.pdf">PDF</a></div>
+    </div>
+
+    <div class="card blue">
+      <div class="top"><div class="ico">🛰️</div><h3>قسم GPS</h3></div>
+      <p>النظام ومكوناته، الإحداثيات والدَاتُم، الأنواع، التركيب والفك، الأعطال وقائمة الفحص.</p>
+      <div class="meta"><span>صفحات ١٦–٣٩</span></div>
+      <div class="btns"><a class="btn go" href="memo/section-gps.pdf">PDF</a><a class="btn cy" href="memo/section-gps.docx">Word</a></div>
+    </div>
+
+    <div class="card blue">
+      <div class="top"><div class="ico">📡</div><h3>قسم الرادار</h3></div>
+      <p>المكوّنات، الماغنترون والحالة الصلبة، النطاقات والشعاع، التركيب والفك، الشاشة والأعطال.</p>
+      <div class="meta"><span>صفحات ٤١–٦٩</span></div>
+      <div class="btns"><a class="btn go" href="memo/section-radar.pdf">PDF</a><a class="btn cy" href="memo/section-radar.docx">Word</a></div>
+    </div>
+
+  </div>
+
+  <!-- ═════════ للمنسّقات ═════════ -->
+  <h2 class="sec"><i>📝</i> تقارير التعديل <small>للمنسّقات الإداريات</small></h2>
+  <p class="hint">كل تصحيح وإضافة بالنص الحالي والنص البديل وموضعه بالصفحة — للرجوع إليها عند تحديث الملف الأصلي.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="top"><div class="ico">📡</div><h3>تعديلات قسم الرادار</h3></div>
+      <p>٩ تصحيحات و١١ إضافة مع مواضعها بالصفحات.</p>
+      <div class="btns"><a class="btn" href="reports/radar-changes.pdf">PDF</a></div>
+    </div>
+    <div class="card">
+      <div class="top"><div class="ico">🛰️</div><h3>تعديلات قسم GPS</h3></div>
+      <p>٨ تصحيحات و١٠ إضافات مع مواضعها بالصفحات.</p>
+      <div class="btns"><a class="btn" href="reports/gps-changes.pdf">PDF</a></div>
+    </div>
+  </div>
+
+  <div class="note"><b>ملاحظة:</b> العروض التفاعلية تحتاج اتصالاً بالإنترنت عند أول فتح فقط لتحميل الصور والخطوط. يُفضَّل فتح الرابط قبل بداية المحاضرة بدقائق على جهاز القاعة. ونسخة PDF متاحة لكل عرض كاحتياط.</div>
+
+  <footer>إعداد: مهندس أول/ علي المتروك · قسم الأجهزة الملاحية والرادار — خفر السواحل</footer>
+</div>
+</body>
+</html>

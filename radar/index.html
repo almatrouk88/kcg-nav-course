@@ -1,0 +1,1429 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>جهاز الرادار — دورة الأجهزة الملاحية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Changa:wght@500;700;800&family=Vazirmatn:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b1220; --panel: rgba(255,255,255,.045); --panel-2: rgba(255,255,255,.08); --line: rgba(255,255,255,.12);
+    --ink: #eef2f7; --dim: #a5b3c6; --amber: #f5a524; --amber-2: #ffcf6e; --cyan: #38bdf8; --green: #4ade80; --red: #f87171; --orange: #ff8a5c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); font-family: "Vazirmatn", "Geeza Pro", Tahoma, sans-serif; font-weight: 400; }
+  h1, h2, h3, h4, .display { font-family: "Changa", "Geeza Pro", sans-serif; font-weight: 700; line-height: 1.2; }
+  svg text { font-family: "Vazirmatn", "Geeza Pro", sans-serif; }
+  img { max-width: 100%; display: block; }
+
+  .deck { position: relative; width: 100%; height: 100%; }
+  .deck::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0; background: radial-gradient(1200px 600px at 85% -10%, rgba(56,189,248,.14), transparent 60%), radial-gradient(900px 500px at 10% 110%, rgba(245,165,36,.12), transparent 60%); }
+  .slide { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr; padding: clamp(1rem, 3.2vw, 2.6rem) clamp(1.2rem, 5vw, 5rem) clamp(3.2rem, 6vh, 4rem); opacity: 0; visibility: hidden; transform: translateX(-40px); transition: opacity .45s ease, transform .55s cubic-bezier(.2,.8,.2,1), visibility 0s .45s; z-index: 1; overflow: hidden; }
+  .slide.active { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; z-index: 2; }
+  .slide.prev { transform: translateX(40px); }
+  .slide header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: clamp(.5rem, 1.8vh, 1.2rem); }
+  .slide header .k { color: var(--amber); font-family: "Changa", sans-serif; font-weight: 800; font-size: clamp(1rem, 2vw, 1.3rem); letter-spacing: .04em; white-space: nowrap; }
+  .slide header .k small { color: var(--dim); font-weight: 500; font-size: .7em; }
+  .slide header h2 { font-size: clamp(1.5rem, 3.8vw, 2.7rem); }
+  .slide header .src { margin-inline-start: auto; font-size: .78rem; color: var(--dim); border: 1px solid var(--line); border-radius: 8px; padding: .05rem .6rem; white-space: nowrap; }
+  .body { display: grid; gap: clamp(.9rem, 2.5vw, 2rem); align-content: center; min-height: 0; }
+  .two { grid-template-columns: 1.1fr 1fr; align-items: center; }
+  .two.eq { grid-template-columns: 1fr 1fr; } .two.wide { grid-template-columns: 1.5fr 1fr; }
+  @media (max-width: 860px) { .two, .two.eq, .two.wide { grid-template-columns: 1fr; } }
+  .lead { font-size: clamp(1.05rem, 2.1vw, 1.5rem); line-height: 1.8; max-width: 40ch; font-weight: 300; }
+  .lead strong { color: var(--amber-2); font-weight: 600; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(.8rem, 1.8vw, 1.3rem); backdrop-filter: blur(6px); }
+  .panel svg { width: 100%; height: auto; display: block; }
+  .panel .ptitle { font-family: "Changa", sans-serif; color: var(--cyan); font-size: 1rem; margin-bottom: .4rem; display: flex; justify-content: space-between; align-items: center; }
+  .panel .ptitle small { color: var(--dim); font-weight: 400; font-size: .78rem; font-family: "Vazirmatn", sans-serif; }
+  .photo { border-radius: 20px; overflow: hidden; border: 1px solid var(--line); position: relative; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; }
+  .photo .cap { position: absolute; inset-inline: 0; bottom: 0; padding: .5rem .9rem; background: linear-gradient(transparent, rgba(5,10,20,.88)); font-size: clamp(.85rem, 1.4vw, 1rem); color: var(--ink); }
+  .note { border: 1px dashed rgba(56,189,248,.5); border-radius: 12px; padding: .6rem .9rem; font-size: clamp(.9rem, 1.5vw, 1.05rem); color: var(--dim); }
+  .note b { color: var(--cyan); }
+  .warn { border: 1px solid rgba(245,165,36,.45); background: rgba(245,165,36,.07); border-radius: 12px; padding: .6rem .9rem; font-size: clamp(.9rem, 1.5vw, 1.05rem); }
+  .warn b { color: var(--amber-2); }
+
+  .frag { opacity: 0; transform: translateY(14px); transition: opacity .4s, transform .5s cubic-bezier(.2,.8,.2,1); }
+  .frag.show { opacity: 1; transform: none; }
+
+  /* الغلاف والفواصل */
+  .title-slide { grid-template-rows: 1fr auto; }
+  .title-slide .bgimg { position: absolute; inset: 0; z-index: -1; opacity: .12; object-fit: cover; width: 100%; height: 100%; mask-image: linear-gradient(90deg, transparent 5%, #000 45%); }
+  .title-slide .hero { display: grid; align-content: center; gap: .5rem; position: relative; }
+  .title-slide .hero .tag { color: var(--cyan); font-weight: 500; letter-spacing: .06em; }
+  .title-slide h1 { font-size: clamp(1.8rem, 4.6vw, 3.8rem); font-weight: 800; line-height: 1.15; max-width: 22ch; }
+  .title-slide h1 span { color: var(--amber); }
+  .title-slide .sub { color: var(--dim); font-size: clamp(.95rem, 1.8vw, 1.25rem); max-width: 48ch; }
+  .title-slide .logo { width: clamp(64px, 9vw, 110px); margin-bottom: .3rem; filter: drop-shadow(0 6px 20px rgba(0,0,0,.5)); }
+  .title-slide .radar { position: absolute; inset-inline-end: 0; top: 50%; translate: 0 -50%; width: min(44vw, 480px); opacity: .35; pointer-events: none; }
+  .title-slide .radar .sw { transform-origin: 200px 200px; animation: spin 6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .title-slide .hint { color: var(--dim); font-size: .85rem; display: flex; gap: 1.4rem; flex-wrap: wrap; }
+  .kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 0 .45rem; font-size: .85em; color: var(--ink); }
+  .team { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .4rem 1.2rem; font-size: clamp(.75rem, 1.2vw, .9rem); line-height: 1.5; color: var(--dim); margin-top: .5rem; max-width: 760px; }
+  .team b { display: block; font-size: .8em; color: var(--cyan); font-weight: 500; }
+  .divider .bgimg { opacity: .42; mask-image: linear-gradient(90deg, rgba(0,0,0,.15), #000 55%); }
+  .divider .hero .tag { font-family: "Changa", sans-serif; font-size: 1.1rem; }
+
+  /* خريطة الدرس */
+  .roadmap { display: grid; grid-template-columns: repeat(7, 1fr); gap: .5rem; position: relative; }
+  @media (max-width: 860px) { .roadmap { grid-template-columns: repeat(4, 1fr); } }
+  .roadmap::before { content: ""; position: absolute; top: 34px; inset-inline: 7%; height: 2px; background: var(--line); }
+  .rm { display: grid; justify-items: center; gap: .35rem; text-align: center; position: relative; }
+  .rm .dot { width: 68px; height: 68px; border-radius: 50%; display: grid; place-items: center; font-size: 1.7rem; background: var(--panel-2); border: 2px solid var(--line); transition: .3s; }
+  .rm b { font-family: "Changa", sans-serif; font-size: clamp(.85rem, 1.5vw, 1.05rem); color: var(--ink); }
+  .rm span { font-size: .78rem; color: var(--dim); }
+  .rm.on .dot { border-color: var(--amber); background: rgba(245,165,36,.18); box-shadow: 0 0 0 6px rgba(245,165,36,.12); transform: scale(1.08); }
+  .rm.done .dot { border-color: var(--green); }
+  .rm.on b { color: var(--amber-2); }
+  .roadmap.mini { margin-top: 1.2rem; max-width: 900px; } .roadmap.mini .dot { width: 46px; height: 46px; font-size: 1.15rem; } .roadmap.mini::before { top: 23px; } .roadmap.mini span { display: none; }
+  .outcomes { list-style: none; display: grid; gap: .55rem; }
+  .outcomes li { display: grid; grid-template-columns: 2rem 1fr; gap: .7rem; align-items: start; font-size: clamp(1rem, 1.9vw, 1.25rem); color: var(--ink); }
+  .outcomes li i { font-style: normal; color: var(--green); font-weight: 700; }
+  .outcomes li span { color: var(--dim); font-size: .85em; display: block; }
+
+  /* بطاقات */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(.7rem, 1.8vw, 1.3rem); }
+  .cards.c2 { grid-template-columns: repeat(2, 1fr); } .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 860px) { .cards, .cards.c2, .cards.c4 { grid-template-columns: 1fr 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: clamp(.8rem, 2vw, 1.3rem); display: grid; gap: .3rem; align-content: start; }
+  .card .ico { font-size: 1.8rem; }
+  .card h3 { font-size: clamp(1.1rem, 2vw, 1.45rem); color: var(--amber-2); }
+  .card h3 small { display: block; font-family: "Vazirmatn", sans-serif; font-weight: 400; font-size: .7em; color: var(--dim); }
+  .card p { color: var(--dim); font-size: clamp(.9rem, 1.5vw, 1.08rem); line-height: 1.65; }
+  .card.ok { border-color: rgba(74,222,128,.4); } .card.ok h3 { color: var(--green); }
+  .card.bad { border-color: rgba(248,113,113,.35); } .card.bad h3 { color: var(--red); }
+  .card .ph { border-radius: 12px; overflow: hidden; aspect-ratio: 16/10; margin-bottom: .4rem; border: 1px solid var(--line); background: #06131f; }
+  .card .ph img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s; }
+  .card .ph svg { width: 100%; height: 100%; display: block; }
+  .card:hover .ph img { transform: scale(1.06); }
+
+  .biglist { list-style: none; display: grid; gap: .55rem; }
+  .biglist li { display: grid; grid-template-columns: 2.6rem 1fr; gap: .9rem; align-items: baseline; font-size: clamp(1rem, 1.85vw, 1.25rem); }
+  .biglist .n { font-family: "Changa", sans-serif; font-weight: 800; color: var(--amber); font-size: clamp(1.4rem, 3vw, 2.1rem); line-height: 1; }
+  .biglist b { color: var(--ink); font-weight: 600; }
+  .biglist span { color: var(--dim); font-size: .88em; display: block; line-height: 1.6; }
+  .biglist li.clickable { cursor: pointer; padding: .3rem .5rem; border-radius: 10px; border: 1px solid transparent; }
+  #stages11 .n { font-size: 1.25rem; } #stages11 li { grid-template-columns: 1.8rem 1fr; gap: .5rem; }
+  .biglist li.clickable.on { background: var(--panel-2); border-color: rgba(245,165,36,.5); }
+
+  .vs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: stretch; }
+  @media (max-width: 860px) { .vs { grid-template-columns: 1fr; } .vs .mid { display: none; } }
+  .vs .col { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(.9rem, 2vw, 1.4rem); display: grid; align-content: start; gap: .4rem; }
+  .vs .col h3 { font-size: clamp(1.2rem, 2.5vw, 1.8rem); }
+  .vs .col.a h3 { color: var(--amber-2); } .vs .col.b h3 { color: var(--cyan); } .vs .col.g h3 { color: var(--green); } .vs .col.r h3 { color: var(--red); }
+  .vs .col ul { list-style: none; display: grid; gap: .3rem; font-size: clamp(.95rem, 1.65vw, 1.15rem); color: var(--dim); }
+  .vs .col ul li::before { content: "▸ "; color: var(--amber); }
+  .vs .col.b ul li::before { color: var(--cyan); } .vs .col.g ul li::before { content: "✓ "; color: var(--green); } .vs .col.r ul li::before { content: "✗ "; color: var(--red); }
+  .vs .mid { display: grid; place-items: center; font-family: "Changa", sans-serif; font-weight: 800; font-size: 2rem; color: var(--dim); }
+
+  /* مؤشرات مقارنة */
+  .meters { display: grid; gap: .45rem; margin-top: .4rem; }
+  .meter { display: grid; grid-template-columns: 7rem 1fr 1fr; gap: .6rem; align-items: center; font-size: clamp(.8rem, 1.35vw, .95rem); color: var(--dim); }
+  .meter .mbar { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; direction: ltr; }
+  .meter .mbar i { display: block; height: 100%; border-radius: 99px; width: 0; transition: width .8s cubic-bezier(.2,.8,.2,1); }
+  .meter .mbar.a i { background: var(--amber); } .meter .mbar.b i { background: var(--cyan); }
+  .frag.show .meter .mbar i { width: var(--w); }
+  .meters-head { display: grid; grid-template-columns: 7rem 1fr 1fr; gap: .6rem; font-family: "Changa", sans-serif; font-size: .9rem; }
+  .meters-head .a { color: var(--amber-2); } .meters-head .b { color: var(--cyan); }
+
+  table.cmp { width: 100%; border-collapse: collapse; font-size: clamp(.9rem, 1.55vw, 1.15rem); }
+  table.cmp th, table.cmp td { padding: .42rem .7rem; text-align: start; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.cmp th { font-family: "Changa", sans-serif; color: var(--amber-2); font-weight: 700; font-size: 1.05em; }
+  table.cmp td:first-child { color: var(--ink); font-weight: 500; white-space: nowrap; }
+  table.cmp td { color: var(--dim); }
+  table.cmp tr.frag { display: table-row; }
+
+  .qa { display: grid; gap: .7rem; }
+  .qa .q { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: .8rem 1.1rem; display: grid; gap: .25rem; font-size: clamp(.95rem, 1.8vw, 1.2rem); }
+  .qa .q b { color: var(--amber-2); font-weight: 600; } .qa .q .a { color: var(--green); }
+
+  .timeline { display: grid; grid-template-columns: repeat(5, 1fr); gap: .6rem; position: relative; }
+  @media (max-width: 860px) { .timeline { grid-template-columns: 1fr; } }
+  .step { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: .9rem; display: grid; gap: .3rem; align-content: start; position: relative; }
+  .step .n { font-family: "Changa", sans-serif; font-weight: 800; font-size: 1.8rem; color: var(--amber); line-height: 1; }
+  .step h4 { font-size: clamp(1rem, 1.6vw, 1.2rem); color: var(--ink); }
+  .step p { font-size: clamp(.85rem, 1.35vw, 1rem); color: var(--dim); line-height: 1.6; }
+
+  /* نقاط التوضيح */
+  .hs-wrap { position: relative; border-radius: 20px; overflow: hidden; border: 1px solid var(--line); }
+  .hs-wrap img { width: 100%; display: block; }
+  .hs { position: absolute; width: 34px; height: 34px; border-radius: 50%; background: rgba(245,165,36,.25); border: 2px solid var(--amber); color: #fff; font-family: "Changa", sans-serif; font-weight: 800; display: grid; place-items: center; cursor: pointer; translate: -50% -50%; transition: .25s; }
+  .hs::after { content: ""; position: absolute; inset: -8px; border-radius: 50%; border: 2px solid var(--amber); opacity: .7; animation: ping 1.8s ease-out infinite; }
+  @keyframes ping { 0% { transform: scale(.6); opacity: .8 } 100% { transform: scale(1.5); opacity: 0 } }
+  .hs.on { background: var(--amber); color: #0b1220; transform: scale(1.15); } .hs.on::after { animation: none; opacity: 0; }
+  .hs-info { display: grid; gap: .5rem; align-content: start; }
+  .hs-info .pv { border-radius: 14px; overflow: hidden; aspect-ratio: 16/10; border: 1px solid var(--line); background: #06131f; }
+  .hs-info .pv img { width: 100%; height: 100%; object-fit: cover; }
+  .hs-info h3 { color: var(--amber-2); font-size: clamp(1.1rem, 2vw, 1.5rem); }
+  .hs-info h3 small { color: var(--dim); font-family: "Vazirmatn", sans-serif; font-weight: 400; font-size: .7em; margin-inline-start: .5rem; }
+  .hs-info p { color: var(--dim); font-size: clamp(.9rem, 1.5vw, 1.05rem); line-height: 1.7; }
+
+  /* أدوات التفاعل */
+  .ctrls { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .6rem; align-items: center; }
+  .btn { font: inherit; font-weight: 600; font-size: .85rem; background: var(--cyan); color: #06202e; border: 0; border-radius: 10px; padding: .4rem .9rem; cursor: pointer; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); } .btn.warm { background: var(--orange); }
+  .btn:hover { filter: brightness(1.08); }
+  .slider { display: grid; gap: .1rem; min-width: 150px; flex: 1; font-size: .8rem; color: var(--dim); }
+  .slider input { width: 100%; accent-color: var(--amber); }
+  .readout { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: .6rem; }
+  .readout div { background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: .35rem .7rem; font-size: .78rem; color: var(--dim); min-width: 7rem; }
+  .readout b { display: block; font-family: "Changa", sans-serif; font-size: 1.15rem; color: var(--ink); direction: ltr; text-align: end; }
+  .bandsel { display: flex; gap: .5rem; }
+  .bandsel button { flex: 1; font: inherit; font-family: "Changa", sans-serif; font-weight: 700; font-size: 1.1rem; background: var(--panel); color: var(--dim); border: 2px solid var(--line); border-radius: 12px; padding: .4rem; cursor: pointer; }
+  .bandsel button.on { color: var(--amber-2); border-color: var(--amber); }
+
+  /* الشريط السفلي */
+  .bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; align-items: center; gap: .8rem; padding: .55rem clamp(1rem, 3vw, 2rem); font-size: .82rem; color: var(--dim); background: linear-gradient(transparent, rgba(11,18,32,.9)); }
+  .bar .prog { flex: 1; height: 3px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  .bar .prog i { display: block; height: 100%; width: 0; background: var(--amber); transition: width .4s; }
+  .bar button { font: inherit; background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: .2rem .65rem; cursor: pointer; }
+  .bar button:hover { border-color: var(--amber); color: var(--amber-2); }
+  .bar .cnt { font-family: "Changa", sans-serif; font-weight: 700; direction: ltr; }
+  .bar .ttl { max-width: 30ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* النظرة العامة */
+  .overview { position: absolute; inset: 0; z-index: 20; background: #0b1220; padding: 2rem clamp(1rem, 4vw, 4rem) 3rem; overflow: auto; display: none; }
+  .overview.open { display: block; }
+  .overview h2 { font-size: 1.6rem; margin-bottom: 1rem; color: var(--amber-2); }
+  .ov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: .7rem; }
+  .ov { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: .7rem .8rem; cursor: pointer; display: grid; gap: .2rem; min-height: 5.6rem; transition: .2s; align-content: start; }
+  .ov:hover, .ov.cur { border-color: var(--amber); background: rgba(245,165,36,.1); }
+  .ov .num { font-family: "Changa", sans-serif; color: var(--amber); font-weight: 800; font-size: .95rem; }
+  .ov .t { font-size: .92rem; color: var(--ink); line-height: 1.4; }
+  .ov .ch { font-size: .75rem; color: var(--dim); }
+  .ov .th { border-radius: 8px; overflow: hidden; aspect-ratio: 16/8; margin-top: .3rem; }
+  .ov .th img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* SVG */
+  .flow { stroke-dasharray: 8 10; animation: dash .9s linear infinite; }
+  @keyframes dash { to { stroke-dashoffset: -18; } }
+  .go { animation: go 3s linear infinite; } .back { animation: back 3s linear infinite; }
+  @keyframes go { 0% { transform: translateX(0); opacity: 1 } 45% { transform: translateX(-400px); opacity: 1 } 46%,100% { opacity: 0 } }
+  @keyframes back { 0%,48% { transform: translateX(-400px); opacity: 0 } 50% { opacity: 1 } 95% { transform: translateX(0); opacity: 1 } 100% { opacity: 0 } }
+  .glow { filter: drop-shadow(0 0 6px currentColor); }
+  .hl { transition: opacity .3s, stroke .3s; }
+  .sweep { transform-origin: 0 0; animation: spin 4s linear infinite; }
+  .spin-slow { animation: spin 5s linear infinite; }
+  .blink { animation: blink 5s steps(1) infinite; } @keyframes blink { 0%, 4% { opacity: 1 } 5%, 100% { opacity: .15 } }
+  .waves-out { animation: wave-out 2.4s linear infinite; } @keyframes wave-out { from { transform: scale(.2); opacity: 1 } to { transform: scale(1.6); opacity: 0 } }
+  .slot-wave { animation: slot 1.6s ease-out infinite; } @keyframes slot { from { transform: translateY(0); opacity: 1 } to { transform: translateY(-46px); opacity: 0 } }
+  .amb { animation: amb 6s linear infinite; } @keyframes amb { from { transform: translateX(120px); } to { transform: translateX(-560px); } }
+  .letters { display: flex; gap: clamp(.5rem, 1.6vw, 1.2rem); direction: ltr; justify-content: flex-end; flex-wrap: wrap; }
+  .letters > div { text-align: center; }
+  .letters span { display: inline-block; font-family: "Changa", sans-serif; font-weight: 800; font-size: clamp(1.8rem, 5vw, 3.6rem); color: var(--amber); }
+  .letters small { display: block; color: var(--dim); font-size: clamp(.75rem, 1.3vw, .95rem); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+  /* ===== الطباعة / PDF ===== */
+  @page { size: 297mm 167mm; margin: 0; }
+  @media print {
+    html, body { overflow: visible; height: auto; background: #0b1220; }
+    * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .deck { height: auto; }
+    .slide { position: relative; inset: auto; opacity: 1 !important; visibility: visible !important; transform: none !important; height: 167mm; width: 297mm; page-break-after: always; break-after: page; }
+    .frag { opacity: 1 !important; transform: none !important; }
+    .meter .mbar i { width: var(--w) !important; }
+    .bar, .overview, .title-slide .hint, .ctrls, .slider { display: none !important; }
+  }
+
+  /* v4.2 — احتياط الشاشات القصيرة (1280×800 / 1366×768): تصغير جسم الشريحة بدل قصّ المحتوى */
+  @media (max-height: 820px) { .slide .body { zoom: .90; } }
+  @media (max-height: 780px) { .slide .body { zoom: .81; } }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ═══ 1 الغلاف ═══ -->
+<section class="slide title-slide active" data-title="الغلاف" data-ch="0" data-notes="رحّب، عرّف بنفسك، واذكر أن هذا الفصل الثالث (الرادار) من دورة الأجهزة الملاحية.">
+  <img class="bgimg" src="media/scanners.jpg" alt="">
+  <div class="hero">
+    <svg class="radar" viewBox="0 0 400 400" aria-hidden="true">
+      <g fill="none" stroke="#38bdf8" stroke-opacity=".45"><circle cx="200" cy="200" r="190"/><circle cx="200" cy="200" r="130"/><circle cx="200" cy="200" r="70"/><line x1="200" y1="10" x2="200" y2="390"/><line x1="10" y1="200" x2="390" y2="200"/></g>
+      <g class="sw"><path d="M200 200 L200 10 A190 190 0 0 1 300 38 Z" fill="#38bdf8" opacity=".28"/></g>
+      <g fill="#ffcf6e"><ellipse cx="270" cy="110" rx="9" ry="5"/><ellipse cx="110" cy="260" rx="11" ry="6"/><ellipse cx="250" cy="310" rx="6" ry="4"/></g>
+    </svg>
+    <img class="logo" src="media/logo.png" alt="شعار خفر السواحل">
+    <span class="tag">قسم الأجهزة الملاحية والرادار</span>
+    <h1>دورة تشغيل وصيانة وفك وتركيب<br><span>الأجهزة الملاحية</span> على القوارب السريعة</h1>
+    <p class="sub">VHF · GPS · ECHO SOUNDER · NOKIA · RADAR — الفصل الثالث: جهاز الرادار</p>
+    <div class="team">
+      <div><b>إعداد</b>مهندس أول/ علي المتروك</div>
+    </div>
+  </div>
+  <div class="hint"><span><span class="kbd">← / مسافة</span> التالي</span><span><span class="kbd">→</span> السابق</span><span><span class="kbd">F</span> ملء الشاشة</span><span><span class="kbd">O</span> نظرة عامة</span><span><span class="kbd">P</span> وضع المحاضر</span><span><span class="kbd">G</span> شريحة رقم</span></div>
+</section>
+
+<!-- ═══ 2 ماذا ستتعلم ═══ -->
+<section class="slide" data-title="ماذا ستستفيد من هذا الفصل؟" data-ch="0" data-notes="اقرأ الأهداف الخمسة بسرعة، ثم أشّر على خريطة المحطات السبع: هذا مسارنا اليوم.">
+  <header><span class="k">تمهيد</span><h2>ماذا ستستفيد من هذا الفصل؟</h2></header>
+  <div class="body two">
+    <div>
+      <p class="lead" style="margin-bottom:.6rem">بنهاية هذا الفصل ستكون قادرًا على:</p>
+      <ul class="outcomes">
+        <li class="frag"><i>✓</i><div>تشرح <b>كيف يرى الرادار</b> ما لا تراه العين<span>مبدأ النبضة والصدى، ومعادلة المسافة</span></div></li>
+        <li class="frag"><i>✓</i><div>تسمّي <b>كل قطعة داخل وحدة الهوائي</b> وتعرف وظيفتها<span>ماغنترون · مودوليتر · IF · هوائي · موتور · ليمتر</span></div></li>
+        <li class="frag"><i>✓</i><div>تفرّق بين <b>رادار الماغنترون ورادار الحالة الصلبة</b><span>والنطاقين X-band و S-band</span></div></li>
+        <li class="frag"><i>✓</i><div>تركّب الرادار وتفكّه <b>بأمان</b><span>خطوات التركيب، الفك، والسلامة الخاصة بالماغنترون</span></div></li>
+        <li class="frag"><i>✓</i><div>تضبط <b>إعدادات الشاشة</b> الصحيحة للمشغّل<span>Gain · Sea Clutter · Rain Clutter</span></div></li>
+      </ul>
+    </div>
+    <div>
+      <p class="lead frag" style="margin-bottom:.8rem">مسارنا اليوم — سبع محطات:</p>
+      <div class="roadmap frag" id="roadmap-main">
+        <div class="rm" data-ch="1"><div class="dot">📡</div><b>ما هو الرادار</b><span>التعريف والاستخدام</span></div>
+        <div class="rm" data-ch="2"><div class="dot">🧩</div><b>المكوّنات</b><span>الوحدتان والأربع</span></div>
+        <div class="rm" data-ch="3"><div class="dot">🔬</div><b>داخل الماغنترون</b><span>القطع وكيف يعمل</span></div>
+        <div class="rm" data-ch="4"><div class="dot">💠</div><b>الحالة الصلبة</b><span>النوع الحديث والمقارنة</span></div>
+        <div class="rm" data-ch="5"><div class="dot">〰️</div><b>النطاقات والشعاع</b><span>X/S · الشعاع · دوبلر</span></div>
+        <div class="rm" data-ch="6"><div class="dot">🔧</div><b>التركيب والفك</b><span>الخطوات والسلامة</span></div>
+        <div class="rm" data-ch="7"><div class="dot">🖥️</div><b>الشاشة والأعطال</b><span>الإعدادات وتشخيص الأعطال</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ فاصل ١ ═══ -->
+<section class="slide title-slide divider" data-title="المحطة ١ — ما هو الرادار" data-ch="1" data-notes="محطة ١ من ٧.">
+  <img class="bgimg" src="media/scanner-mount.jpg" alt="">
+  <div class="hero"><span class="tag">المحطة ١ من ٧</span><h1>ما هو <span>الرادار</span>؟</h1><p class="sub">التعريف، ومجالات الاستخدام</p><div class="roadmap mini rm-auto"></div></div>
+  <div class="hint"></div>
+</section>
+
+<!-- ═══ 3 جهاز الرادار ═══ -->
+<section class="slide" data-title="جهاز الرادار" data-ch="1" data-notes="ابدأ بالاسم: RAdio Detection And Ranging. الرقم: 300 متر كل ميكروثانية. نقسم على 2 لأن الزمن ذهاب وإياب.">
+  <header><span class="k">٠١</span><h2>جهاز الرادار</h2><span class="src">الشريحة ٢</span></header>
+  <div class="body two">
+    <div>
+      <div class="letters frag"><div><span>RA</span><small>Radio</small></div><div><span>D</span><small>Detection</small></div><div><span>A</span><small>And</small></div><div><span>R</span><small>Ranging</small></div></div>
+      <p class="lead frag" style="margin-top:1rem">الرادار جهاز يستخدم <strong>موجات الراديو الميكروويفية</strong> (microwave radio frequencies) لتحديد <strong>الموقع والمسافة والسرعة والاتجاه</strong> للأجسام، مع إمكانية رصد الأهداف وتتبعها.</p>
+    </div>
+    <div class="panel frag">
+      <div class="ptitle">أرسل ← انعكس ← عاد صدى <small>رسم متحرك</small></div>
+      <svg viewBox="0 0 600 220" role="img" aria-label="نبضة تخرج وتعود صدى">
+        <path d="M0 175 q25 -8 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 V220 H0 Z" fill="#0a1628"/>
+        <path d="M520 175 h60 l-9 14 h-42 z" fill="#3b5470"/><rect x="546" y="120" width="6" height="55" fill="#6b86a3"/><rect x="536" y="112" width="26" height="8" rx="2" fill="#dbe7f1"/>
+        <path d="M90 168 h44 l-7 12 h-30 z" fill="#f5a524"/><rect x="108" y="146" width="7" height="22" fill="#ffcf6e"/>
+        <g class="go"><path d="M520 120 q8 -16 16 0 q8 16 16 0" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/></g>
+        <g class="back"><path d="M520 120 q6 -10 12 0 q6 10 12 0" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round"/></g>
+        <text x="330" y="60" text-anchor="middle" font-size="15" fill="#dbe7f1">الموجة تقطع 300 m كل ميكروثانية</text>
+        <text x="330" y="205" text-anchor="middle" font-size="14" fill="#ffcf6e" direction="ltr">R = c × t ÷ 2</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 4 مجالات الاستخدام ═══ -->
+<section class="slide" data-title="مجالات الاستخدام" data-ch="1" data-notes="سؤال للقاعة: متى تحتاج الرادار وأنت تشوف بعينك؟ الجواب المطلوب: الليل، الضباب، الغبار، تقدير المسافة.">
+  <header><span class="k">٠٢</span><h2>مجالات استخدام جهاز الرادار</h2><span class="src">الشريحة ٣</span></header>
+  <div class="body">
+    <div class="cards">
+      <div class="card frag"><div class="ph"><img src="media/tower.jpg" alt="برج مراقبة جوية"></div><h3>الطيران</h3><p>رادارات مراقبة الحركة الجوية تراقب وتدير تحركات الطائرات لضمان الملاحة الآمنة والهبوط في المطارات.</p></div>
+      <div class="card frag ok"><div class="ph"><img src="media/scanners.jpg" alt="هوائيات رادار على زورق"></div><h3>الملاحة البحرية</h3><p>أنظمة الرادار على السفن تساعد على الملاحة واكتشاف المعوقات ومراقبة السفن الأخرى لتجنب الاصطدام — وهذا مجالنا.</p></div>
+      <div class="card frag"><div class="ph"><svg viewBox="0 0 320 200"><rect width="320" height="200" fill="#0a1b30"/><g fill="#4ade80" opacity=".8"><path d="M40 120 q30 -50 70 -20 q20 -40 60 -10 q30 -30 60 10 q20 -10 40 20 v40 H40z"/></g><g fill="#38bdf8"><rect x="70" y="150" width="3" height="18"/><rect x="110" y="155" width="3" height="18"/><rect x="150" y="150" width="3" height="18"/><rect x="190" y="156" width="3" height="18"/><rect x="230" y="150" width="3" height="18"/></g><circle cx="160" cy="100" r="60" fill="none" stroke="#dbe7f1" stroke-opacity=".3"/><line x1="160" y1="100" x2="160" y2="40" stroke="#dbe7f1" stroke-opacity=".5"/></svg></div><h3>مراقبة الطقس</h3><p>رادارات الطقس تتبع هطول الأمطار والعواصف والأحداث الجوية الشديدة، وتوفر بيانات التنبؤات والتحذيرات.</p></div>
+    </div>
+    <p class="lead frag" style="max-width:70ch"><strong>سؤال للنقاش:</strong> متى تحتاج الرادار في الدورية وأنت ترى بعينك؟ — الليل، الضباب، الغبار، وتقدير المسافة الحقيقية لهدف بعيد.</p>
+  </div>
+</section>
+
+<!-- ═══ فاصل ٢ ═══ -->
+<section class="slide title-slide divider" data-title="المحطة ٢ — المكوّنات" data-ch="2" data-notes="محطة ٢ من ٧.">
+  <img class="bgimg" src="media/scanners.jpg" alt="">
+  <div class="hero"><span class="tag">المحطة ٢ من ٧</span><h1>ممّ يتكوّن <span>الرادار البحري</span>؟</h1><p class="sub">الوحدتان الرئيسيتان، والوحدات الأربع داخل الهوائي</p><div class="roadmap mini rm-auto"></div></div>
+  <div class="hint"></div>
+</section>
+
+<!-- ═══ 5 المكونات ═══ -->
+<section class="slide" data-title="مكونات الرادار البحري" data-ch="2" data-notes="اربط الوحدتين مكانيًا: الهوائي فوق، الشاشة بالقمرة، بينهما كيبل البيانات وكيبل الطاقة. الارتفاع مهم — سنعود له بالتركيب.">
+  <header><span class="k">٠٣</span><h2>مكونات جهاز الرادار البحري</h2><span class="src">الشريحة ٤</span></header>
+  <div class="body two wide">
+    <div class="panel">
+      <div class="ptitle">أين تقع الوحدتان على الزورق؟ <small>مقطع جانبي</small></div>
+      <svg viewBox="0 0 760 300" role="img" aria-label="مقطع جانبي للزورق يوضح الهوائي فوق والشاشة داخل القمرة">
+        <path d="M0 240 q30 -10 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t40 0 V300 H0Z" fill="#0a1628"/>
+        <path d="M120 240 L640 240 L600 275 L170 275 Z" fill="#3b5470"/>
+        <path d="M640 240 L700 210 L640 210 Z" fill="#3b5470"/>
+        <rect x="300" y="150" width="200" height="90" rx="8" fill="#22354d" stroke="#3f6a8a"/>
+        <rect x="320" y="165" width="70" height="40" rx="3" fill="#0a1628" stroke="#38bdf8"/>
+        <rect x="410" y="165" width="70" height="40" rx="3" fill="#06131f" stroke="#4ade80"/><circle cx="445" cy="185" r="14" fill="none" stroke="#4ade80" stroke-opacity=".6"/><line x1="445" y1="185" x2="455" y2="175" stroke="#4ade80"/>
+        <text x="445" y="228" text-anchor="middle" font-size="13" fill="#4ade80" font-weight="600">وحدة العرض (Display)</text>
+        <rect x="396" y="60" width="8" height="90" fill="#6b86a3"/>
+        <rect x="350" y="46" width="100" height="16" rx="8" fill="#ffcf6e"/>
+        <text x="400" y="34" text-anchor="middle" font-size="13" fill="#ffcf6e" font-weight="600">وحدة الهوائي (Scanner)</text>
+        <path d="M352 54 L40 30 L40 100 Z" fill="#38bdf8" opacity=".15"/>
+        <path d="M404 62 q30 40 20 90 q-5 30 20 40" fill="none" stroke="#f5a524" stroke-width="3" stroke-dasharray="6 5" class="flow"/>
+        <text x="470" y="130" font-size="12" fill="#f5a524" text-anchor="middle">كيبل البيانات + الطاقة</text>
+        <line x1="240" y1="54" x2="240" y2="240" stroke="#9aa9bd" stroke-dasharray="4 4"/><text x="222" y="150" text-anchor="middle" font-size="12" fill="#9aa9bd" transform="rotate(-90 222 150)">ارتفاع الهوائي h</text>
+        <rect x="540" y="250" width="40" height="20" rx="3" fill="#22354d" stroke="#f5a524"/><text x="560" y="291" text-anchor="middle" font-size="11" fill="#9aa9bd">البطارية 12/24 V</text>
+        <path d="M444 205 q60 20 96 45" fill="none" stroke="#f87171" stroke-width="2"/><path d="M448 208 q60 20 92 47" fill="none" stroke="#111" stroke-width="2"/>
+      </svg>
+    </div>
+    <div style="display:grid;gap:.7rem">
+      <div class="photo frag" style="aspect-ratio:16/9;max-height:34vh"><img src="media/scanners.jpg" alt="وحدات الهوائي فوق الزورق"><div class="cap"><b style="color:var(--amber-2)">١ — وحدة الهوائي (Scanner)</b> تتكون من المرسل والهوائي والمستقبل ومعالج الإشارة.</div></div>
+      <div class="photo frag" style="aspect-ratio:16/9;max-height:34vh"><img src="media/display-unit.jpg" alt="شاشة الرادار"><div class="cap"><b style="color:var(--cyan)">٢ — وحدة عرض المعلومات</b> شاشة الرادار التي تعرض البيانات المعالجة.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 6 الوحدات الأربع ═══ -->
+<section class="slide" data-title="الوحدات الأربع + مخطط الكتل" data-ch="2" data-notes="اضغط كل وحدة في القائمة لتضيء في المخطط. الأزرق مسار الإرسال، الأخضر الاستقبال، والدوبلكسر يبدّل بينهما.">
+  <header><span class="k">٠٤</span><h2>أجزاء هوائي الرادار وطريقة عمله</h2><span class="src">الشريحة ٥</span></header>
+  <div class="body two wide">
+    <div class="panel">
+      <div class="ptitle">مخطط الكتل <small>اضغط أي وحدة — في القائمة أو على الرسم — لتضيء</small></div>
+      <svg viewBox="0 0 900 420" id="blk5" role="img" aria-label="مخطط الرادار المبسط">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#9aa9bd"/></marker></defs>
+        <text x="450" y="24" text-anchor="middle" font-size="14" fill="#9aa9bd" direction="ltr">Simplified Radar Block Diagram</text>
+        <!-- إطار المستقبل/المعالج -->
+        <rect x="470" y="200" width="330" height="170" rx="10" fill="rgba(56,189,248,.08)" stroke="#38bdf8" stroke-dasharray="6 5"/>
+        <!-- مسار الذهاب (أزرق) ومسار العودة (أخضر) -->
+        <path id="txPath" d="M115 300 V266 M115 232 H230 V130 H300 M300 130 H660" fill="none" stroke="#38bdf8" stroke-width="5" stroke-dasharray="10 8" opacity=".55" class="flow"/>
+        <path id="rxPath" d="M660 150 H320 M320 150 V232 M230 232 H565 V215 M565 279 V300 M565 335 H640" fill="none" stroke="#4ade80" stroke-width="5" stroke-dasharray="10 8" opacity=".55" class="flow"/>
+        <!-- النقاط المتحركة: ثلاثة أوضاع -->
+        <g id="modeFull"><circle r="9" fill="#38bdf8" class="glow" color="#38bdf8"><animateMotion dur="7s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.45;1" calcMode="linear" path="M115 300 V232 H230 V130 H660"/><animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.45;0.46;1" dur="7s" repeatCount="indefinite"/></circle>
+        <circle r="7" fill="#4ade80" class="glow" color="#4ade80"><animateMotion dur="7s" repeatCount="indefinite" keyPoints="0;0;1" keyTimes="0;0.5;1" calcMode="linear" path="M660 150 H320 V232 H565 V335 H640"/><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.5;0.51;1" dur="7s" repeatCount="indefinite"/></circle></g>
+        <g id="modeTx" style="display:none"><circle r="10" fill="#38bdf8" class="glow" color="#38bdf8"><animateMotion dur="3.5s" repeatCount="indefinite" path="M115 300 V232 H230 V130 H660"/></circle></g>
+        <g id="modeRx" style="display:none"><circle r="8" fill="#4ade80" class="glow" color="#4ade80"><animateMotion dur="3.5s" repeatCount="indefinite" path="M660 150 H320 V232 H565 V335 H640"/></circle></g>
+        <!-- الهوائي (طبق) -->
+        <g class="hl blk" data-k="ant" style="cursor:pointer">
+          <path d="M300 60 a70 70 0 0 1 0 140" fill="none" stroke="#38bdf8" stroke-width="5"/>
+          <line x1="310" y1="112" x2="310" y2="148" stroke="#dbe7f1" stroke-width="4"/>
+          <text x="250" y="92" text-anchor="middle" font-size="16" font-weight="700" fill="#dbe7f1" direction="ltr">Antenna</text>
+          <text x="250" y="112" text-anchor="middle" font-size="11" fill="#9aa9bd">يدوّره Motor Drive</text>
+        </g>
+        <text x="262" y="205" font-size="12" fill="#9aa9bd" direction="ltr" text-anchor="start" style="direction:ltr">Waveguide</text>
+        <!-- الهدف -->
+        <g class="hl blk" data-k="tgt" style="cursor:pointer"><rect x="670" y="105" width="30" height="50" fill="#9fd3ea" stroke="#dbe7f1"/><path d="M670 105 l8 -8 h30 v50 l-8 8" fill="#7ec9e3" stroke="#dbe7f1"/><text x="690" y="180" text-anchor="middle" font-size="15" font-weight="700" fill="#dbe7f1" direction="ltr">Target</text></g>
+        <text x="480" y="118" text-anchor="middle" font-size="13" fill="#38bdf8">→ ذهاب: نبضة قوية</text>
+        <text x="480" y="172" text-anchor="middle" font-size="13" fill="#4ade80">← عودة: صدى ضعيف</text>
+        <!-- الدوبلكسر -->
+        <g class="hl blk" data-k="dup" style="cursor:pointer"><circle cx="230" cy="232" r="14" fill="#ffcf6e" stroke="#0b1220" stroke-width="2"/><text x="230" y="270" text-anchor="middle" font-size="15" font-weight="700" fill="#dbe7f1" direction="ltr">Duplexer</text></g>
+        <!-- الصناديق -->
+        <g font-size="17" font-weight="700" fill="#0b1220" direction="ltr">
+          <g class="hl blk" data-k="tx" style="cursor:pointer"><rect x="40" y="200" width="150" height="64" rx="6" fill="#ffe94a"/><text x="115" y="238" text-anchor="middle">Transmitter</text></g>
+          <g class="hl blk" data-k="mod" style="cursor:pointer"><rect x="40" y="300" width="150" height="64" rx="6" fill="#ffe94a"/><text x="115" y="338" text-anchor="middle">Modulator</text></g>
+          <g class="hl blk" data-k="clk" style="cursor:pointer"><rect x="250" y="310" width="120" height="50" rx="6" fill="#ffe94a"/><text x="310" y="331" text-anchor="middle" font-size="15">Master</text><text x="310" y="350" text-anchor="middle" font-size="15">clock</text></g>
+          <g class="hl blk" data-k="rx" style="cursor:pointer"><rect x="500" y="215" width="130" height="64" rx="6" fill="#ffe94a"/><text x="565" y="253" text-anchor="middle">Receiver</text></g>
+          <g class="hl blk" data-k="sp" style="cursor:pointer"><text x="455" y="316" text-anchor="middle" font-size="13" fill="#f87171">Signal processor</text><text x="455" y="332" text-anchor="middle" font-size="11" fill="#f87171">(computer)</text>
+            <rect x="640" y="300" width="130" height="64" rx="6" fill="#06131f" stroke="#dbe7f1" stroke-width="2"/><circle cx="705" cy="325" r="10" fill="#4ade80" opacity=".9"/><text x="705" y="352" text-anchor="middle" font-size="12" fill="#dbe7f1">Display</text></g>
+        </g>
+        <!-- أسهم ثابتة -->
+        <g stroke="#dbe7f1" stroke-width="2" fill="none" marker-end="url(#ar)" opacity=".7"><line x1="250" y1="335" x2="192" y2="335"/><line x1="370" y1="345" x2="638" y2="345"/></g>
+        <!-- مفتاح الألوان -->
+        <g font-size="12"><rect x="40" y="392" width="26" height="6" fill="#38bdf8"/><text x="72" y="398" fill="#38bdf8" text-anchor="start" style="direction:ltr">ذهاب: مودوليتر ← مرسل ← دوبلكسر ← هوائي ← الهدف</text>
+        <rect x="470" y="392" width="26" height="6" fill="#4ade80"/><text x="502" y="398" fill="#4ade80" text-anchor="start" style="direction:ltr">عودة: الهدف ← هوائي ← دوبلكسر ← مستقبل ← شاشة</text></g>
+      </svg>
+      <div class="ctrls" style="justify-content:center"><button class="btn sig-m" data-m="tx" style="background:#38bdf8">📤 الإشارة المرسلة</button><button class="btn sig-m" data-m="rx" style="background:#4ade80">📥 الإشارة المستقبلة</button><button class="btn sig-m ghost" data-m="full">🔁 الدورة الكاملة</button></div>
+    </div>
+    <ul class="biglist" id="list5">
+      <li class="clickable frag" data-k="tx mod clk"><span class="n">١</span><div><b>المرسل (Transmitter)</b><span>يُطلق موجات كهرومغناطيسية (radio frequency wave) — في رادار الماغنترون: المودوليتر + الماغنترون.</span></div></li>
+      <li class="clickable frag" data-k="ant dup tgt"><span class="n">٢</span><div><b>الهوائي (Antenna)</b><span>ينقل إشارة الرادار في الهواء ويستقبل الإشارات المنعكسة.</span></div></li>
+      <li class="clickable frag" data-k="rx dup"><span class="n">٣</span><div><b>المستقبل (Receiver)</b><span>يلتقط الإشارات المنعكسة من الهدف ويحوّلها إلى صيغة مناسبة للمعالجة.</span></div></li>
+      <li class="clickable frag" data-k="sp"><span class="n">٤</span><div><b>معالج الإشارة (Signal Processor)</b><span>يصفّي الضوضاء ويقوّي الإشارة ويستخرج المسافة والسرعة والاتجاه.</span></div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 7 الأنواع: صورتان ═══ -->
+<section class="slide" data-title="أنواع الرادارات البحرية" data-ch="2" data-notes="خلّ الفرق يُرى: الماغنترون بأنبوبه ومودوليتره وقطعه الكثيرة، والحالة الصلبة ببورد واحد. كلاهما يرسل نبضات.">
+  <header><span class="k">٠٥</span><h2>أنواع الرادارات البحرية — الفرق يُرى بالعين</h2><span class="src">الشريحة ٦</span></header>
+  <div class="body">
+    <div class="two eq" style="display:grid;gap:1rem">
+      <div class="photo frag" style="aspect-ratio:16/10"><img src="media/scanner-open.jpg" alt="داخل رادار ماغنترون"><div class="cap"><b style="color:var(--amber-2)">رادار الماغنترون (Pulse Radar التقليدي)</b> — يرسل نبضات قصيرة من الطاقة الميكروويفية يولّدها أنبوب الماغنترون، ويقيس زمن عودتها. قطع كثيرة: ماغنترون، مودوليتر، IF…</div></div>
+      <div class="photo frag" style="aspect-ratio:16/10"><img src="media/solid-state.jpg" alt="داخل رادار حالة صلبة" style="object-position:center 30%"><div class="cap"><b style="color:var(--cyan)">رادار الحالة الصلبة (Solid State Radar)</b> — مكونات إلكترونية صلبة (ترانزستورات وصمامات ثنائية) تولّد إشارات الميكروويف وتضخّمها. بورد واحد.</div></div>
+    </div>
+    <div class="note frag"><b>انتبه:</b> النوعان يرسلان <b>نبضات</b>. الفرق الحقيقي في <b>مصدر توليد الموجة</b>: أنبوب مفرّغ أم ترانزستورات.</div>
+  </div>
+</section>
+
+<!-- ═══ فاصل ٣ ═══ -->
+<section class="slide title-slide divider" data-title="المحطة ٣ — داخل رادار الماغنترون" data-ch="3" data-notes="محطة ٣ من ٧ — صورة حقيقية من ورشتنا.">
+  <img class="bgimg" src="media/scanner-open.jpg" alt="">
+  <div class="hero"><span class="tag">المحطة ٣ من ٧</span><h1>داخل رادار <span>الماغنترون</span></h1><p class="sub">القطع الست، وكيف تعمل معًا — بصور من ورشتنا</p><div class="roadmap mini rm-auto"></div></div>
+  <div class="hint"></div>
+</section>
+
+<!-- ═══ 8 فتح الهوائي — نقاط التوضيح ═══ -->
+<section class="slide" data-title="فتح الهوائي — تعرّف على القطع" data-ch="3" data-notes="اضغط النقاط على الصورة الحقيقية. الهوائي نفسه غير ظاهر (فوق الغطاء) — يجلس على الموتور.">
+  <header><span class="k">٠٦ <small>· ١ من ٤</small></span><h2>افتح الهوائي: أين كل قطعة؟</h2><span class="src">الشريحة ٧–٩</span></header>
+  <div class="body two wide">
+    <div class="hs-wrap" id="hsWrap">
+      <img src="media/scanner-open.jpg" alt="وحدة هوائي مفتوحة">
+      <button class="hs" style="left:18%;top:52%" data-i="0">١</button>
+      <button class="hs" style="left:48%;top:43%" data-i="1">٢</button>
+      <button class="hs" style="left:48%;top:56%" data-i="2">٣</button>
+      <button class="hs" style="left:48%;top:26%" data-i="3">٤</button>
+      <button class="hs" style="left:78%;top:42%" data-i="4">٥</button>
+    </div>
+    <div class="hs-info" id="hsInfo">
+      <div class="pv"><img id="hsImg" src="media/scanner-open.jpg" alt=""></div>
+      <h3 id="hsT">اضغط أي نقطة على الصورة</h3>
+      <p id="hsP">خمس قطع ظاهرة أمامك. الهوائي نفسه (الدليل الموجي المشقوق) يجلس فوق الموتور وليس ظاهرًا في هذه اللقطة — نراه في الشريحة التالية.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 9 القطع ١ ═══ -->
+<section class="slide" data-title="القطع الداخلية ١ — الماغنترون، المودوليتر، IF" data-ch="3" data-notes="الماغنترون: أنبوب مفرّغ بمغناطيسين يولّد الميكروويف مباشرة من نبضة الجهد العالي. قطعة تُستهلك — تضعف فتبهت الصورة.">
+  <header><span class="k">٠٦ <small>· ٢ من ٤</small></span><h2>رادار الماغنترون يحتوي بداخله</h2><span class="src">الشريحة ٨</span></header>
+  <div class="body">
+    <div class="cards">
+      <div class="card frag"><div class="ph"><img src="media/magnetron.jpg" alt="الماغنترون"></div><h3>الماغنترون <small>Magnetron</small></h3><p>أنبوب تفريغ (vacuum tube) يعمل كمذبذب ميكروويف (microwave oscillator) لإنشاء إشارة الرادار. <b>قطعة تُستهلك</b>.</p></div>
+      <div class="card frag"><div class="ph"><img src="media/modulator.jpg" alt="لوحة المودوليتر"></div><h3>لوحة التعديل <small>Modulator Board</small></h3><p>مفتاح قدرة عالية ومحوّل ومكثفات. تعطي الماغنترون الطاقة اللازمة وتتحكم في <b>توقيت</b> النبضات.</p></div>
+      <div class="card frag"><div class="ph"><img src="media/if-board.jpg" alt="لوحة التردد المتوسط"></div><h3>لوحة التردد المتوسط <small>IF Board</small></h3><p>تحوّل الإشارات عالية التردد إلى تردد متوسط وتصفّيها — ثم يستخرج المعالج المعلومات.</p></div>
+    </div>
+    <div class="warn frag"><b>ملاحظة للفني:</b> أشهر عطل تقابله هو <b>ضعف الماغنترون</b>: الصورة تبهت تدريجيًا، الأهداف البعيدة تختفي، ومؤشر Tune لا يستقر. لا مشكلة في الشاشة ولا في الكيبل — الأنبوب انتهى عمره.</div>
+  </div>
+</section>
+
+<!-- ═══ 9b كيف يعمل الماغنترون ═══ -->
+<section class="slide" data-title="كيف يعمل الماغنترون — ببساطة" data-ch="3" data-notes="مثال الصفّارة: هواء + فتحة = نغمة. هنا: إلكترونات + تجاويف = ميكروويف. المغناطيس هو اللي يدوّر الإلكترونات. نفس القطعة في مايكرويف المطبخ.">
+  <header><span class="k">٠٦ <small>· ٣ من ٤</small></span><h2>كيف يعمل الماغنترون؟ — ببساطة</h2><span class="src">توضيح</span></header>
+  <div class="body two wide">
+    <div class="panel">
+      <div class="ptitle">داخل الماغنترون <small>رسم مبسّط متحرك</small></div>
+      <svg viewBox="0 0 640 360" role="img" aria-label="مقطع الماغنترون" style="max-height:50vh;margin:0 auto">
+        <rect x="120" y="30" width="400" height="30" rx="6" fill="#f87171" opacity=".85"/><text x="320" y="51" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">مغناطيس N</text>
+        <rect x="120" y="300" width="400" height="30" rx="6" fill="#38bdf8" opacity=".85"/><text x="320" y="321" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">مغناطيس S</text>
+        <g stroke="#f87171" stroke-width="1.5" stroke-dasharray="3 5" opacity=".5"><line x1="200" y1="62" x2="200" y2="298"/><line x1="260" y1="62" x2="260" y2="298"/><line x1="380" y1="62" x2="380" y2="298"/><line x1="440" y1="62" x2="440" y2="298"/></g>
+        <circle cx="320" cy="180" r="92" fill="#22354d" stroke="#dbe7f1" stroke-width="3"/>
+        <g fill="#0b1220" stroke="#dbe7f1"><circle cx="320" cy="100" r="15"/><circle cx="377" cy="123" r="15"/><circle cx="400" cy="180" r="15"/><circle cx="377" cy="237" r="15"/><circle cx="320" cy="260" r="15"/><circle cx="263" cy="237" r="15"/><circle cx="240" cy="180" r="15"/><circle cx="263" cy="123" r="15"/></g>
+        <circle cx="320" cy="180" r="16" fill="#ffcf6e"/><text x="320" y="185" text-anchor="middle" font-size="12" fill="#0b1220" font-weight="700">سلك ساخن</text>
+        <g class="spin-slow" style="transform-origin:320px 180px"><g fill="#4ade80" class="glow" color="#4ade80"><circle cx="320" cy="132" r="5"/><circle cx="360" cy="150" r="5"/><circle cx="366" cy="200" r="5"/><circle cx="330" cy="228" r="5"/><circle cx="282" cy="215" r="5"/><circle cx="273" cy="168" r="5"/><circle cx="298" cy="138" r="5"/></g></g>
+        <path d="M60 180 H222" stroke="#f5a524" stroke-width="4" stroke-dasharray="8 6" class="flow"/><text x="130" y="165" text-anchor="middle" font-size="12" fill="#f5a524">نبضة جهد عالٍ من المودوليتر</text>
+        <path d="M414 180 H520" stroke="#ffcf6e" stroke-width="4"/><g fill="none" stroke="#ffcf6e" stroke-width="3"><path d="M530 168 q10 12 0 24"/><path d="M545 160 q16 20 0 40" opacity=".6"/><path d="M560 152 q22 28 0 56" opacity=".35"/></g><text x="560" y="230" text-anchor="middle" font-size="12" fill="#ffcf6e">موجة ميكروويف للهوائي</text>
+        <text x="320" y="350" text-anchor="middle" font-size="12" fill="#9aa9bd">الإلكترونات (الأخضر) تدور بفعل المغناطيس وتمر على أفواه التجاويف الثمانية فـ«تصفّر» ميكروويف</text>
+      </svg>
+    </div>
+    <div style="display:grid;gap:.55rem;align-content:center">
+      <div class="frag">
+        <div class="ptitle" style="color:var(--amber-2);font-family:Changa,sans-serif;font-size:1rem;margin-bottom:.3rem">١ · ممّ يتكون؟ — ٤ أشياء فقط</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+          <span class="kbd" style="font-size:.9rem;padding:.2rem .7rem">🫙 علبة معدنية مفرّغة من الهواء</span>
+          <span class="kbd" style="font-size:.9rem;padding:.2rem .7rem">🔥 سلك ساخن في المنتصف</span>
+          <span class="kbd" style="font-size:.9rem;padding:.2rem .7rem">🕳️ ٨ حفر حوله (التجاويف)</span>
+          <span class="kbd" style="font-size:.9rem;padding:.2rem .7rem">🧲 مغناطيسان فوق وتحت</span>
+        </div>
+      </div>
+      <div class="frag">
+        <div class="ptitle" style="color:var(--amber-2);font-family:Changa,sans-serif;font-size:1rem;margin-bottom:.3rem">٢ · كيف يشتغل؟ — من أول خطوة لآخر خطوة</div>
+        <ul class="biglist" style="font-size:.84em;gap:.2rem">
+          <li><span class="n" style="font-size:1.3rem">١</span><div><b>تجي كهرباء قوية</b><span>ضربة جهد عالٍ من لوحة التعديل (المودوليتر).</span></div></li>
+          <li><span class="n" style="font-size:1.3rem">٢</span><div><b>السلك يسخن ويطلق إلكترونات</b><span>مثل فتيلة اللمبة — الحرارة تطلع منها إلكترونات.</span></div></li>
+          <li><span class="n" style="font-size:1.3rem">٣</span><div><b>المغناطيس يدوّرها</b><span>بدل ما تمشي مستقيم، تلفّ داخل العلبة.</span></div></li>
+          <li><span class="n" style="font-size:1.3rem">٤</span><div><b>تمر على الحفر فتطلع موجة</b><span>مثل النفخ على فوهة قنينة — يطلع «صفير» لكنه هنا موجة ميكروويف.</span></div></li>
+          <li><span class="n" style="font-size:1.3rem">٥</span><div><b>الموجة تخرج من المنفذ للهوائي</b><span>وهذي هي نبضة الرادار.</span></div></li>
+        </ul>
+      </div>
+      <div class="warn frag" style="padding:.5rem .8rem"><b>وين نلقى الماغنترون غير الرادار؟</b> في <b>مايكرويف المطبخ</b> (نفس القطعة — تسخّن الأكل بدل ما ترسل نبضات) · وأجهزة التسخين الصناعي · وبعض أجهزة العلاج الطبيعي بالحرارة.</div>
+      <div class="note frag" style="padding:.35rem .8rem;font-size:.85rem"><b>للفني:</b> مغناطيسه يسحب المفك · يضعف مع الساعات فتبهت الصورة · يحتاج إحماء قبل الإرسال.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 10 القطع ٢ ═══ -->
+<section class="slide" data-title="القطع الداخلية ٢ — الهوائي، الموتور، الليمتر" data-ch="3" data-notes="الشقوق في الدليل الموجي هي التي تصنع الشعاع. الموتور يدوّر ويرسل نبضة اتجاه كل دورة. الليمتر حارس المستقبل.">
+  <header><span class="k">٠٦ <small>· ٤ من ٤</small></span><h2>رادار الماغنترون يحتوي بداخله — تابع</h2><span class="src">الشريحة ٩</span></header>
+  <div class="body">
+    <div class="cards">
+      <div class="card frag"><div class="ph" style="max-height:26vh"><img src="media/antenna-slot.jpg" alt="الهوائي المشقوق"></div><h3>الهوائي <small>Antenna</small></h3><p>وظيفتان: إرسال النبضات في الهواء واستقبال الترددات العائدة من الأجسام.</p>
+        <div class="ph" style="aspect-ratio:16/7;margin-top:.4rem;max-height:16vh"><svg viewBox="0 0 320 140" role="img" aria-label="الدليل الموجي المشقوق"><rect width="320" height="140" fill="#06131f"/>
+          <rect x="30" y="90" width="260" height="26" rx="4" fill="#dbe7f1"/><g fill="#0b1220"><rect x="50" y="97" width="10" height="12" rx="2"/><rect x="80" y="97" width="10" height="12" rx="2"/><rect x="110" y="97" width="10" height="12" rx="2"/><rect x="140" y="97" width="10" height="12" rx="2"/><rect x="170" y="97" width="10" height="12" rx="2"/><rect x="200" y="97" width="10" height="12" rx="2"/><rect x="230" y="97" width="10" height="12" rx="2"/><rect x="260" y="97" width="10" height="12" rx="2"/></g>
+          <g stroke="#38bdf8" stroke-width="2" fill="none" class="slot-wave"><path d="M50 92 q5 -6 10 0"/><path d="M80 92 q5 -6 10 0"/><path d="M110 92 q5 -6 10 0"/><path d="M140 92 q5 -6 10 0"/><path d="M170 92 q5 -6 10 0"/><path d="M200 92 q5 -6 10 0"/><path d="M230 92 q5 -6 10 0"/><path d="M260 92 q5 -6 10 0"/></g>
+          <path d="M40 85 L160 20 L280 85" fill="#38bdf8" opacity=".12"/>
+          <text x="160" y="16" text-anchor="middle" font-size="11" fill="#38bdf8">الشقوق معًا تصنع شعاعًا ضيقًا موجّهًا</text>
+          <text x="160" y="132" text-anchor="middle" font-size="10" fill="#9aa9bd">دليل موجي مشقوق (Slotted Waveguide)</text>
+        </svg></div></div>
+      <div class="card frag"><div class="ph" style="max-height:26vh"><img src="media/motor.jpg" alt="محرك الدوران"></div><h3>محرك الدوران <small>Motor Drive</small></h3><p>المسؤول عن دوران الهوائي بشكل صحيح وبسرعة ثابتة.</p>
+        <div class="ph" style="aspect-ratio:16/7;margin-top:.4rem;max-height:16vh"><svg viewBox="0 0 320 140" role="img" aria-label="دوران الهوائي ونبضة الاتجاه"><rect width="320" height="140" fill="#06131f"/>
+          <g transform="translate(110 70)"><circle r="52" fill="none" stroke="#3f6a8a"/><g class="spin-slow" style="transform-origin:0 0"><rect x="-50" y="-5" width="100" height="10" rx="5" fill="#dbe7f1"/><path d="M0 -5 L-70 -30 L-70 20 Z" fill="#38bdf8" opacity=".25"/></g><circle r="6" fill="#ffcf6e"/><rect x="-3" y="-58" width="6" height="8" fill="#f5a524" class="blink"/></g>
+          <text x="110" y="132" text-anchor="middle" font-size="10" fill="#9aa9bd">نبضة الاتجاه كل دورة → الشاشة تعرف أين يشير الهوائي</text>
+          <text x="240" y="60" text-anchor="middle" font-size="12" fill="#dbe7f1">٢٤–٤٨</text><text x="240" y="80" text-anchor="middle" font-size="11" fill="#9aa9bd">دورة / دقيقة</text>
+        </svg></div></div>
+      <div class="card frag"><div class="ph" style="max-height:26vh"><img src="media/limiter.jpg" alt="المحدد"></div><h3>المحدد <small>Limiter</small></h3><p>يحمي المستقبل من الموجات العائدة القوية (أهداف كبيرة وقريبة) ويساعد في تصفية الإشارة.</p>
+        <div class="ph" style="aspect-ratio:16/7;margin-top:.4rem;max-height:16vh"><svg viewBox="0 0 320 140" role="img" aria-label="الليمتر يقص القمم"><rect width="320" height="140" fill="#06131f"/>
+          <line x1="20" y1="100" x2="300" y2="100" stroke="#3f6a8a"/><line x1="20" y1="40" x2="300" y2="40" stroke="#f87171" stroke-dasharray="4 4"/><text x="300" y="34" text-anchor="end" font-size="10" fill="#f87171" direction="ltr">حد القص</text>
+          <path d="M290 100 q-10 -20 -20 0 q-10 -25 -20 0 q-10 -110 -25 0 q-10 -18 -20 0 q-10 -30 -20 0" fill="none" stroke="#9aa9bd" stroke-width="2"/>
+          <path d="M150 100 q-10 -20 -20 0 q-10 -25 -20 0 q-8 -60 -12 -60 h-4 q-4 0 -9 60 q-10 -18 -20 0 q-10 -30 -20 0" fill="none" stroke="#4ade80" stroke-width="2.5"/>
+          <text x="220" y="125" text-anchor="middle" font-size="10" fill="#9aa9bd">قبل: صدى ضخم يهدد المستقبل</text><text x="90" y="125" text-anchor="middle" font-size="10" fill="#4ade80">بعد الليمتر: القمة مقصوصة</text>
+        </svg></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 11 الدوبلكسر والليمتر — محاكاة ═══ -->
+<section class="slide" data-title="الدوبلكسر والليمتر — محاكاة" data-ch="3" data-notes="جرّب الأزرار: نبضة إرسال (الباب مغلق)، صدى عادي (يمر)، صدى ضخم (الليمتر يقصّه).">
+  <header><span class="k">٠٦ <small>· توضيح</small></span><h2>كيف لا يحترق المستقبل؟ الدوبلكسر والليمتر</h2><span class="src">إضافة توضيحية</span></header>
+  <div class="body two wide">
+    <div class="panel">
+      <div class="ptitle">محاكاة الحماية <small>وضع: <span id="modeLbl">إرسال</span></small></div>
+      <svg viewBox="0 0 640 300" id="dupSvg" role="img" aria-label="محاكاة عمل الدوبلكسر والليمتر">
+        <rect x="500" y="40" width="120" height="50" rx="10" fill="#ffcf6e"/><text x="560" y="70" text-anchor="middle" font-size="13" font-weight="600" fill="#0b1220">المرسل (kW)</text>
+        <rect x="500" y="210" width="120" height="50" rx="10" fill="#a7f3c4"/><text x="560" y="240" text-anchor="middle" font-size="13" font-weight="600" fill="#0b1220">المستقبل (mW)</text>
+        <rect x="400" y="210" width="70" height="50" rx="10" fill="#fde8c0"/><text x="435" y="240" text-anchor="middle" font-size="12" font-weight="600" fill="#0b1220">Limiter</text>
+        <rect x="30" y="120" width="90" height="60" rx="10" fill="#dbe7f1"/><text x="75" y="155" text-anchor="middle" font-size="13" font-weight="600" fill="#0b1220">الهوائي</text>
+        <circle cx="300" cy="150" r="46" fill="#0b1220" stroke="#fde8c0" stroke-width="3"/><text x="300" y="205" text-anchor="middle" font-size="12" fill="#fde8c0" font-weight="600">Duplexer</text>
+        <path d="M500 65 H330 Q300 65 300 95" fill="none" stroke="#3f6a8a" stroke-width="3"/><path d="M254 150 H120" fill="none" stroke="#3f6a8a" stroke-width="3"/><path d="M300 196 Q300 235 330 235 H400" fill="none" stroke="#3f6a8a" stroke-width="3"/><path d="M470 235 H500" fill="none" stroke="#3f6a8a" stroke-width="3"/>
+        <line id="arm" x1="300" y1="150" x2="300" y2="104" stroke="#fde8c0" stroke-width="6" stroke-linecap="round" style="transform-origin:300px 150px; transition: transform .35s cubic-bezier(.2,.8,.2,1)"/><circle cx="300" cy="150" r="7" fill="#fde8c0"/>
+        <g id="gate"><rect x="292" y="176" width="16" height="22" rx="3" fill="#f87171"/><text x="300" y="192" text-anchor="middle" font-size="11" fill="#fff" font-weight="700">✕</text></g>
+        <g id="txp" opacity="0"><circle r="9" fill="#38bdf8" class="glow" color="#38bdf8"/></g><g id="rxp" opacity="0"><circle r="5" fill="#4ade80" class="glow" color="#4ade80"/></g><g id="bigp" opacity="0"><circle r="12" fill="#ff8a5c" class="glow" color="#ff8a5c"/></g>
+        <text x="435" y="290" text-anchor="middle" font-size="11" fill="#9aa9bd" id="limMsg">يمرّر العادي، يقصّ الخطر</text>
+        <text x="320" y="24" text-anchor="middle" font-size="13" fill="#dbe7f1" id="dupMsg">وضع الإرسال: باب المستقبل مغلق</text>
+      </svg>
+      <div class="ctrls"><button class="btn" id="dTx">⚡ نبضة إرسال</button><button class="btn" id="dRx">〰 صدى عادي</button><button class="btn warm" id="dBig">💥 صدى ضخم</button><button class="btn ghost" id="dAuto">▶ دورة تلقائية</button></div>
+    </div>
+    <div>
+      <p class="lead">هوائي واحد، لكن المرسل يطلق <strong>كيلوواطات</strong> والمستقبل يلتقط <strong>مليّ‌واطات</strong>.</p>
+      <p class="lead frag"><strong>الدوبلكسر:</strong> يوجّه النبضة القوية للهوائي ويقفل باب المستقبل، ثم يفتحه للصدى الضعيف — آلاف المرات في الثانية.</p>
+      <p class="lead frag"><strong>الليمتر:</strong> على باب المستقبل؛ يقصّ أي إشارة تتجاوز الحد (تسرّب إرسال أو صدى سفينة ملاصقة).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 12 طريقة العمل — محاكاة ═══ -->
+<section class="slide" data-title="طريقة عمل رادار النبض — محاكاة" data-ch="3" data-notes="حرّك الهدف وأطلق. لاحظ زمن الصدى وقوته الأضعف مع البعد.">
+  <header><span class="k">٠٧ <small>· ١ من ٢</small></span><h2>طريقة عمل رادار النبض</h2><span class="src">الشريحة ١٠</span></header>
+  <div class="body two wide">
+    <div class="panel">
+      <div class="ptitle">رحلة النبضة <small>حرّك الهدف وأطلق</small></div>
+      <svg id="pulseSvg" viewBox="0 0 640 250" role="img" aria-label="محاكاة نبضة الرادار وعودة الصدى">
+        <defs><linearGradient id="beam" x1="1" x2="0"><stop offset="0" stop-color="#38bdf8" stop-opacity=".35"/><stop offset="1" stop-color="#38bdf8" stop-opacity="0"/></linearGradient></defs>
+        <path d="M0 200 q30 -8 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 V250 H0 Z" fill="#0a1628"/>
+        <path d="M560 200 h60 l-10 16 h-42 z" fill="#3c5a78"/><rect x="586" y="150" width="6" height="50" fill="#5b7d9c"/><rect x="574" y="140" width="30" height="10" rx="3" fill="#dbe7f1"/>
+        <path d="M574 145 L20 100 L20 190 Z" fill="url(#beam)"/>
+        <g id="target" transform="translate(180 0)"><path d="M-26 196 h52 l-8 14 h-36 z" fill="#f5a524"/><rect x="-4" y="170" width="8" height="26" fill="#ffcf6e"/></g>
+        <g id="pulse" class="glow" color="#38bdf8"><path d="M-14 0 q7 -14 14 0 q7 14 14 0" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/></g>
+        <g id="echo" class="glow" color="#4ade80" opacity="0"><path d="M-10 0 q5 -9 10 0 q5 9 10 0" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round"/></g>
+        <line x1="40" y1="232" x2="600" y2="232" stroke="#3f6a8a"/>
+        <rect x="596" y="218" width="4" height="14" fill="#38bdf8"/><rect id="tline-rx" x="400" y="222" width="4" height="10" fill="#4ade80"/>
+        <text x="600" y="248" text-anchor="middle" font-size="11" fill="#9aa9bd">إرسال</text><text id="tline-lbl" x="400" y="248" text-anchor="middle" font-size="11" fill="#4ade80">صدى</text>
+        <text x="320" y="30" text-anchor="middle" font-size="13" fill="#dbe7f1" id="stageMsg">اضغط ▶ لإطلاق نبضة</text>
+      </svg>
+      <div class="ctrls"><button class="btn" id="fire">▶ أطلق نبضة</button><button class="btn ghost" id="loop">🔁 تكرار</button><label class="slider">مسافة الهدف: <span id="dLbl" dir="ltr">3.0 nm</span><input type="range" id="dist" min="0.5" max="6" step="0.1" value="3"></label></div>
+      <div class="readout"><div>زمن الصدى<b id="tOut">37.0 µs</b></div><div>المسافة المحسوبة<b id="rOut">3.0 nm</b></div><div>قوة الصدى<b id="pOut">━━━·</b></div></div>
+    </div>
+    <div>
+      <p class="lead">الفكرة في ثلاث كلمات: <strong>أرسل، انتظر، احسب.</strong></p>
+      <p class="lead frag">الرادار يطلق نبضة قصيرة جدًا ثم يسكت ويصغي. زمن عودة الصدى × سرعة الضوء ÷ ٢ = المسافة.</p>
+      <p class="lead frag">لاحظ: الصدى من الهدف البعيد <strong>أضعف</strong> — لهذا نحتاج مستقبلًا حساسًا جدًا، وحماية له (الدوبلكسر والليمتر).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 13 المراحل السبع ═══ -->
+<section class="slide" data-title="المراحل السبع" data-ch="3" data-notes="اضغط كل مرحلة لتضيء قطعتها. في الماغنترون لا مضخّم بعد الماغنترون — المضخّم في الحالة الصلبة.">
+  <header><span class="k">٠٧ <small>· ٢ من ٢</small></span><h2>طريقة عمل رادار النبض — المراحل السبع</h2><span class="src">الشريحة ١٠</span></header>
+  <div class="body two wide">
+    <div class="panel">
+      <div class="ptitle">مخطط الكتل <small>يضيء مع كل مرحلة</small></div>
+      <svg viewBox="0 0 900 330" id="blk11" role="img" aria-label="مخطط كتل">
+        <g font-size="17" font-weight="600" fill="#0b1220">
+          <g class="hl" data-k="mod"><rect x="740" y="40" width="140" height="56" rx="12" fill="#ffcf6e"/><text x="810" y="75" text-anchor="middle">Modulator</text></g>
+          <g class="hl" data-k="mag"><rect x="560" y="40" width="140" height="56" rx="12" fill="#ffcf6e"/><text x="630" y="75" text-anchor="middle">Magnetron</text></g>
+          <g class="hl" data-k="dup"><rect x="380" y="40" width="140" height="56" rx="12" fill="#fde8c0"/><text x="450" y="75" text-anchor="middle">Duplexer</text></g>
+          <g class="hl" data-k="ant"><rect x="160" y="28" width="160" height="80" rx="12" fill="#dbe7f1"/><text x="240" y="62" text-anchor="middle">Antenna</text><text x="240" y="90" text-anchor="middle" font-size="13" font-weight="400">Motor Drive</text></g>
+          <g class="hl" data-k="lim"><rect x="380" y="200" width="140" height="56" rx="12" fill="#a7f3c4"/><text x="450" y="235" text-anchor="middle">Limiter</text></g>
+          <g class="hl" data-k="if"><rect x="560" y="200" width="140" height="56" rx="12" fill="#a7f3c4"/><text x="630" y="228" text-anchor="middle">Receiver</text><text x="630" y="247" text-anchor="middle" font-size="12" font-weight="400">IF board</text></g>
+          <g class="hl" data-k="proc"><rect x="740" y="200" width="140" height="56" rx="12" fill="#a7f3c4"/><text x="810" y="235" text-anchor="middle">Processor</text></g>
+          <g class="hl" data-k="disp"><rect x="740" y="272" width="140" height="48" rx="12" fill="#4ade80"/><text x="810" y="302" text-anchor="middle">Display</text></g>
+        </g>
+        <g stroke="#38bdf8" stroke-width="3" fill="none" marker-end="url(#ar)" class="flow"><line x1="740" y1="68" x2="702" y2="68"/><line x1="560" y1="68" x2="522" y2="68"/><line x1="380" y1="68" x2="322" y2="68"/></g>
+        <g stroke="#4ade80" stroke-width="3" fill="none" marker-end="url(#ar)" class="flow"><line x1="450" y1="96" x2="450" y2="198"/><line x1="520" y1="228" x2="558" y2="228"/><line x1="700" y1="228" x2="738" y2="228"/><line x1="810" y1="256" x2="810" y2="270"/></g>
+        <text x="500" y="150" font-size="14" fill="#4ade80" text-anchor="middle">الصدى العائد</text>
+      </svg>
+      <div class="note" style="margin-top:.6rem" id="stageNote">اضغط على أي مرحلة في القائمة.</div>
+    </div>
+    <ul class="biglist" id="stages11" style="font-size:.76em;gap:.15rem;line-height:1.45">
+      <li class="clickable frag" data-k="mod mag" data-n="المودوليتر يعطي الجهد، الماغنترون يعطي الموجة الكاملة — لا مضخّم بعده."><span class="n">١</span><div><b>توليد الإشارة</b><span>المودوليتر بورد + الماغنترون يولّدان نبضات قوية وقصيرة.</span></div></li>
+      <li class="clickable frag" data-k="mag dup" data-n="في الماغنترون: الماغنترون نفسه هو المرسل. مرحلة المضخّم موجودة في رادار الحالة الصلبة."><span class="n">٢</span><div><b>الإرسال</b><span>النبضة تمر عبر الدليل الموجي والدوبلكسر إلى الهوائي.</span></div></li>
+      <li class="clickable frag" data-k="ant" data-n="الموتور يدوّر الهوائي فيمسح الشعاع كل الاتجاهات."><span class="n">٣</span><div><b>الهوائي</b><span>مدفوعًا بالـ Motor Drive يرسل النبضات في الحيز المطلوب (الهواء).</span></div></li>
+      <li class="clickable frag" data-k="ant dup lim" data-n="القطعة التي تبدّل الهوائي بين الإرسال والاستقبال اسمها الدوبلكسر (Duplexer) — وهي في المخطط."><span class="n">٤</span><div><b>الاستقبال</b><span>وظيفة الهوائي تتحول للاستقبال (عبر الدوبلكسر) ويلتقط النبضات العائدة.</span></div></li>
+      <li class="clickable frag" data-k="if" data-n="الـ IF يحوّل ويضخّم ويفلتر — الاستخراج للمرحلة التالية."><span class="n">٥</span><div><b>معالجة الإشارة</b><span>المستقبل مع IF Board يحوّل النبضات لترددات منخفضة ثم يكبّرها ويفلترها.</span></div></li>
+      <li class="clickable frag" data-k="proc" data-n="المسافة من الزمن، والاتجاه من زاوية الهوائي لحظة الصدى."><span class="n">٦</span><div><b>معالجة البيانات</b><span>تُستخرج البيانات المطلوبة: السرعة، المسافة، الاتجاه.</span></div></li>
+      <li class="clickable frag" data-k="disp" data-n="نقطة مضيئة على الشاشة في المسافة والاتجاه الصحيحين."><span class="n">٧</span><div><b>عرض البيانات</b><span>تُرسل البيانات إلى الشاشة لتُعرض بشكل واضح.</span></div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 14 مميزات وعيوب النبض ═══ -->
+<section class="slide" data-title="مميزات وعيوب رادار النبض" data-ch="3" data-notes="4–25 kW قدرة ذروة لا استهلاك — مثل فلاش الكاميرا.">
+  <header><span class="k">٠٨</span><h2>مميزات وعيوب رادار النبض (الماغنترون)</h2><span class="src">الشريحة ١١</span></header>
+  <div class="body two">
+    <div class="vs" style="grid-template-columns:1fr 1fr">
+      <div class="col g frag"><h3>المميزات</h3><ul><li>رصد الأهداف بعيدة المدى</li><li>دقة عالية في رصد الأهداف</li><li>مرونة في العمل بنطاقات ترددات مختلفة</li><li>توقيت دقيق لقياس المسافات</li></ul></div>
+      <div class="col r frag"><h3>العيوب</h3><ul><li>استهلاك عالٍ للطاقة — لحظة النبضة (4–25 kW ذروة)</li><li>تأثر بالعوامل البيئية مثل الأمطار والضباب</li><li>إمكانية التعرض للتداخل من أنظمة الرادار الأخرى</li><li>الماغنترون يُستهلك ويحتاج إحماء</li></ul></div>
+    </div>
+    <div style="display:grid;gap:.8rem">
+      <div class="photo frag" style="aspect-ratio:16/9"><img src="media/garmin.jpg" alt="رادار قبة مع شاشة"><div class="cap">رادار قبة (Radome) مع وحدة العرض</div></div>
+      <div class="warn frag"><b>توضيح:</b> رقم 4–25 kW هو <b>قدرة الذروة</b> للنبضة لحظيًا. النبضة تدوم أجزاء الميكروثانية، فالاستهلاك الفعلي من البطارية <b>عشرات الواط فقط</b> — مثل فلاش الكاميرا.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ فاصل ٤ ═══ -->
+<section class="slide title-slide divider" data-title="المحطة ٤ — رادار الحالة الصلبة" data-ch="4" data-notes="محطة ٤ من ٧.">
+  <img class="bgimg" src="media/solid-state.jpg" alt="">
+  <div class="hero"><span class="tag">المحطة ٤ من ٧</span><h1>رادار <span>الحالة الصلبة</span></h1><p class="sub">النوع الحديث: بورد واحد بلا ماغنترون — والمقارنة بين النوعين</p><div class="roadmap mini rm-auto"></div></div>
+  <div class="hint"></div>
+</section>
+
+<!-- ═══ 15 رادار الحالة الصلبة ═══ -->
+<section class="slide" data-title="رادار الحالة الصلبة" data-ch="4" data-notes="مولّد ضعيف + مضخّم — هنا فقط توجد مرحلة المضخّم. وميزة دوبلر.">
+  <header><span class="k">٠٩ <small>· ١ من ٤</small></span><h2>رادار الحالة الصلبة (Solid State Radar)</h2><span class="src">الشريحة ١٢</span></header>
+  <div class="body two">
+    <div>
+      <ul class="biglist">
+        <li class="frag"><span class="n">١</span><div><b>التقنية الحديثة</b><span>تعتمد على بورد واحد وتستخدم الترانزستور بدلًا من الماغنترون.</span></div></li>
+        <li class="frag"><span class="n">٢</span><div><b>طريقة العمل</b><span>يستخدم الترانزستور لإنشاء موجات ميكروويف منخفضة الطاقة.</span></div></li>
+        <li class="frag"><span class="n">٣</span><div><b>التضخيم</b><span>تُضخَّم الموجات عن طريق المضخّم (Amplifier) قبل إرسالها.</span></div></li>
+      </ul>
+      <div class="panel frag" style="margin-top:.8rem">
+        <div class="ptitle">مسار الإشارة في الحالة الصلبة <small>مقارنة بالماغنترون</small></div>
+        <svg viewBox="0 0 640 120" role="img" aria-label="مسار الإشارة">
+          <g font-size="13" font-weight="600" fill="#0b1220">
+            <rect x="500" y="20" width="120" height="40" rx="8" fill="#9fd3ea"/><text x="560" y="45" text-anchor="middle">مولّد ترانزستوري</text>
+            <rect x="330" y="20" width="120" height="40" rx="8" fill="#38bdf8"/><text x="390" y="45" text-anchor="middle">مضخّم قدرة</text>
+            <rect x="160" y="20" width="120" height="40" rx="8" fill="#dbe7f1"/><text x="220" y="45" text-anchor="middle">الهوائي</text>
+          </g>
+          <g stroke="#38bdf8" stroke-width="3" fill="none" marker-end="url(#ar)" class="flow"><line x1="500" y1="40" x2="452" y2="40"/><line x1="330" y1="40" x2="282" y2="40"/></g>
+          <path d="M560 78 q6 -8 12 0 q6 8 12 0" fill="none" stroke="#9fd3ea" stroke-width="2"/><text x="572" y="105" text-anchor="middle" font-size="11" fill="#9aa9bd">موجة ضعيفة</text>
+          <path d="M370 84 q10 -24 20 0 q10 24 20 0" fill="none" stroke="#38bdf8" stroke-width="3"/><text x="390" y="105" text-anchor="middle" font-size="11" fill="#9aa9bd">بعد التضخيم</text>
+          <text x="220" y="100" text-anchor="middle" font-size="11" fill="#9aa9bd">بلا جهد عالٍ بالكيلوفولت</text>
+        </svg>
+      </div>
+    </div>
+    <div class="photo frag" style="aspect-ratio:3/4;max-height:64vh"><img src="media/solid-state.jpg" alt="داخل رادار حالة صلبة"><div class="cap">صورة حقيقية: بورد واحد يقوم بالعمل كله</div></div>
+  </div>
+</section>
+
+<!-- ═══ 15b كيف يعمل رادار الحالة الصلبة ═══ -->
+<section class="slide" data-title="كيف يعمل رادار الحالة الصلبة — ببساطة" data-ch="4" data-notes="مثال: مغنٍّ بصوت خفيف في مايك ← أمبليفاير ← سماعات. الترانزستور = صنبور: إشارة صغيرة تتحكم بتيار كبير من البطارية. الفرق عن الماغنترون: هناك الموجة القوية تُصنع من نفسها، هنا صغيرة دقيقة ثم تُكبَّر.">
+  <header><span class="k">٠٩ <small>· ٢ من ٤</small></span><h2>كيف يعمل رادار الحالة الصلبة؟ — ببساطة</h2><span class="src">توضيح</span></header>
+  <div class="body two wide">
+    <div class="panel">
+      <div class="ptitle">من الموجة الصغيرة إلى الهوائي <small>رسم مبسّط متحرك</small></div>
+      <svg viewBox="0 0 640 330" role="img" aria-label="مسار الإشارة في الحالة الصلبة" style="max-height:48vh;margin:0 auto">
+        <defs><marker id="ar9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#9aa9bd"/></marker></defs>
+        <!-- البطارية -->
+        <rect x="250" y="20" width="140" height="34" rx="6" fill="#22354d" stroke="#f5a524"/><text x="320" y="42" text-anchor="middle" font-size="13" fill="#dbe7f1">بطارية الزورق 12/24 V</text>
+        <g stroke="#f5a524" stroke-width="2" fill="none" marker-end="url(#ar9)"><path d="M290 54 V90 H430 V118"/><path d="M320 54 V100 H330 V118"/><path d="M350 54 V90 H230 V118"/></g>
+        <text x="320" y="82" text-anchor="middle" font-size="11" fill="#f5a524">تيار قوي من البطارية يغذّي كل مرحلة</text>
+        <!-- المراحل: من اليمين لليسار -->
+        <g font-size="12" font-weight="700" fill="#0b1220">
+          <rect x="530" y="120" width="95" height="56" rx="8" fill="#9fd3ea"/><text x="577" y="143" text-anchor="middle">بلّورة</text><text x="577" y="161" text-anchor="middle" font-size="10" font-weight="400">مذبذب صغير</text>
+          <rect x="400" y="120" width="70" height="56" rx="8" fill="#38bdf8"/><text x="435" y="143" text-anchor="middle">ترانزستور</text><text x="435" y="161" text-anchor="middle" font-size="10" font-weight="400">مرحلة ١</text>
+          <rect x="295" y="120" width="70" height="56" rx="8" fill="#38bdf8"/><text x="330" y="143" text-anchor="middle">ترانزستور</text><text x="330" y="161" text-anchor="middle" font-size="10" font-weight="400">مرحلة ٢</text>
+          <rect x="195" y="120" width="70" height="56" rx="8" fill="#38bdf8"/><text x="230" y="143" text-anchor="middle">ترانزستور</text><text x="230" y="161" text-anchor="middle" font-size="10" font-weight="400">مرحلة ٣</text>
+          <rect x="30" y="112" width="120" height="72" rx="8" fill="#dbe7f1"/><text x="90" y="145" text-anchor="middle">الهوائي</text><text x="90" y="165" text-anchor="middle" font-size="10" font-weight="400">نبضة الرادار</text>
+        </g>
+        <g stroke="#38bdf8" stroke-width="3" fill="none" marker-end="url(#ar9)" class="flow"><line x1="530" y1="148" x2="472" y2="148"/><line x1="400" y1="148" x2="367" y2="148"/><line x1="295" y1="148" x2="267" y2="148"/><line x1="195" y1="148" x2="152" y2="148"/></g>
+        <!-- الموجات تكبر -->
+        <path d="M560 225 q4 -4 8 0 q4 4 8 0 q4 -4 8 0 q4 4 8 0" fill="none" stroke="#9fd3ea" stroke-width="2"/><text x="577" y="255" text-anchor="middle" font-size="11" fill="#9aa9bd">أقل من واط</text>
+        <path d="M410 225 q6 -10 12 0 q6 10 12 0 q6 -10 12 0 q6 10 12 0" fill="none" stroke="#38bdf8" stroke-width="2.5"/><text x="435" y="255" text-anchor="middle" font-size="11" fill="#9aa9bd">× ١٠</text>
+        <path d="M300 225 q8 -20 15 0 q8 20 15 0 q8 -20 15 0 q8 20 15 0" fill="none" stroke="#38bdf8" stroke-width="3"/><text x="330" y="255" text-anchor="middle" font-size="11" fill="#9aa9bd">× ١٠٠</text>
+        <path d="M195 225 q9 -34 17 0 q9 34 17 0 q9 -34 17 0 q9 34 17 0" fill="none" stroke="#38bdf8" stroke-width="3.5" class="glow" color="#38bdf8"/><text x="230" y="262" text-anchor="middle" font-size="11" fill="#9aa9bd">مئات الواط</text>
+        <text x="320" y="200" text-anchor="middle" font-size="12" fill="#dbe7f1">كل مرحلة تأخذ الموجة وتكبّرها — نفس الشكل، أقوى</text>
+        <!-- الصنبور -->
+        <g transform="translate(60 270)"><rect x="0" y="12" width="120" height="14" rx="4" fill="#3f6a8a"/><rect x="50" y="0" width="20" height="14" rx="3" fill="#ffcf6e"/><path d="M60 0 v-12" stroke="#38bdf8" stroke-width="2"/><text x="60" y="-16" text-anchor="middle" font-size="10" fill="#38bdf8">إشارة صغيرة تحرّك اليد</text><text x="60" y="44" text-anchor="middle" font-size="10" fill="#9aa9bd">تيار كبير يمرّ بنفس الشكل</text></g>
+        <text x="480" y="300" text-anchor="middle" font-size="12" fill="#ffcf6e" font-weight="600">الترانزستور = صنبور كهربائي</text>
+        <text x="480" y="318" text-anchor="middle" font-size="11" fill="#9aa9bd">إشارة صغيرة على «اليد» تتحكم بتيار كبير من البطارية</text>
+      </svg>
+    </div>
+    <div style="display:grid;gap:.5rem;align-content:center">
+      <div class="frag">
+        <div class="ptitle" style="color:var(--amber-2);font-family:Changa,sans-serif;font-size:1rem;margin-bottom:.3rem">كيف يشتغل؟ — خطوة خطوة</div>
+        <ul class="biglist" style="font-size:.84em;gap:.2rem">
+          <li><span class="n" style="font-size:1.3rem">١</span><div><b>الموجة تبدأ من بلّورة صغيرة</b><span>مثل بلّورة ساعة اليد: تهتز بنغمة ثابتة ودقيقة جدًا — لكنها ضعيفة (أقل من واط).</span></div></li>
+          <li><span class="n" style="font-size:1.3rem">٢</span><div><b>تدخل على ترانزستور</b><span>الترانزستور صنبور: الموجة الصغيرة تحرّك «اليد»، فيمرّ تيار البطارية القوي بنفس شكل الموجة.</span></div></li>
+          <li><span class="n" style="font-size:1.3rem">٣</span><div><b>مرحلة ورا مرحلة = مضخّم</b><span>ترانزستور واحد يكبّر شوي، فيحطون ٣–٤ ورا بعض: واط ← عشرة ← مئة ← مئات.</span></div></li>
+          <li><span class="n" style="font-size:1.3rem">٤</span><div><b>الموجة القوية تروح للهوائي</b><span>نفس النغمة الأصلية بالضبط — بس أقوى بآلاف المرات.</span></div></li>
+        </ul>
+      </div>
+      <div class="warn frag" style="padding:.5rem .8rem"><b>المثال:</b> مغنٍّ يغنّي بصوت خفيف في <b>مايك</b> ← الصوت يمر على <b>أمبليفاير</b> ← يطلع من <b>السماعات</b> قويًا. نفس النغمة، بس أعلى. الترانزستور هو «مقبض الصوت» في الأمبليفاير.</div>
+      <div class="note frag" style="padding:.4rem .8rem;font-size:.88rem"><b>الفرق عن الماغنترون:</b> الماغنترون <b>يصنع الموجة القوية من نفسه</b> (صفّارة — ضربة وحدة، نغمتها تختلف شوي كل مرة). الحالة الصلبة <b>تصنع موجة صغيرة دقيقة ثم تكبّرها</b> — لذلك: بلا جهد عالٍ، بلا إحماء، وتعرف نغمتها بالضبط فتقدر تسوّي دوبلر.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 16 مميزات وعيوب الحالة الصلبة ═══ -->
+<section class="slide" data-title="مميزات وعيوب الحالة الصلبة" data-ch="4" data-notes="المؤشرات: مقارنة بصرية سريعة بين النوعين.">
+  <header><span class="k">٠٩ <small>· ٣ من ٤</small></span><h2>مميزات وعيوب رادار الحالة الصلبة</h2><span class="src">الشريحة ١٣</span></header>
+  <div class="body two wide">
+    <div class="cards" style="grid-template-columns:repeat(4,1fr)">
+      <div class="card ok frag"><div class="ico">🔧</div><h3>قليل الصيانة</h3><p>لا ماغنترون يُستبدل.</p></div>
+      <div class="card ok frag"><div class="ico">🛡️</div><h3>اعتمادية عالية</h3><p>مكونات صلبة أقل عرضة للفشل.</p></div>
+      <div class="card ok frag"><div class="ico">📦</div><h3>حجم أصغر</h3><p>أخف وأسهل تركيبًا.</p></div>
+      <div class="card ok frag"><div class="ico">📡</div><h3>مرونة التردد</h3><p>يعمل عبر نطاق واسع.</p></div>
+      <div class="card bad frag"><div class="ico">💰</div><h3>تكلفة شراء أعلى</h3><p>تقنية أحدث.</p></div>
+      <div class="card bad frag"><div class="ico">🧩</div><h3>تعقيد التصميم</h3><p>وظائف مدمجة.</p></div>
+      <div class="card bad frag"><div class="ico">📉</div><h3>قوة إخراج أقل</h3><p>تعوّضها نبضات أطول.</p></div>
+      <div class="card frag" style="border-style:dashed"><div class="ico">💡</div><h3 style="color:var(--cyan)">للفني</h3><p>بلا جهد عالٍ = فك أكثر أمانًا.</p></div>
+    </div>
+    <div class="panel frag">
+      <div class="ptitle">مؤشرات المقارنة <small>نسبي — للتوضيح</small></div>
+      <div class="meters-head"><span></span><span class="a">ماغنترون</span><span class="b">حالة صلبة</span></div>
+      <div class="meters">
+        <div class="meter"><span>قدرة الذروة</span><div class="mbar a"><i style="--w:95%"></i></div><div class="mbar b"><i style="--w:30%"></i></div></div>
+        <div class="meter"><span>الصيانة المطلوبة</span><div class="mbar a"><i style="--w:80%"></i></div><div class="mbar b"><i style="--w:25%"></i></div></div>
+        <div class="meter"><span>الحجم والوزن</span><div class="mbar a"><i style="--w:85%"></i></div><div class="mbar b"><i style="--w:45%"></i></div></div>
+        <div class="meter"><span>التكلفة الأولية</span><div class="mbar a"><i style="--w:45%"></i></div><div class="mbar b"><i style="--w:80%"></i></div></div>
+        <div class="meter"><span>الموثوقية</span><div class="mbar a"><i style="--w:55%"></i></div><div class="mbar b"><i style="--w:90%"></i></div></div>
+        <div class="meter"><span>الأمان للفني</span><div class="mbar a"><i style="--w:35%"></i></div><div class="mbar b"><i style="--w:90%"></i></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 17 جدول المقارنة ═══ -->
+<section class="slide" data-title="مقارنة النوعين" data-ch="4" data-notes="صف صف بالنقر.">
+  <header><span class="k">٠٩ <small>· ٤ من ٤</small></span><h2>مقارنة: رادار النبض (الماغنترون) مقابل الحالة الصلبة</h2><span class="src">الشريحة ١٤</span></header>
+  <div class="body">
+    <div class="panel">
+      <table class="cmp">
+        <thead><tr><th>الميزة</th><th>الرادار النبضي (الماغنترون)</th><th>الرادار ذو الحالة الصلبة</th></tr></thead>
+        <tbody>
+          <tr class="frag"><td>نوع التكنولوجيا</td><td>يعتمد على الماغنترون (أنبوب مفرّغ)</td><td>أجهزة الحالة الصلبة (الترانزستورات)</td></tr>
+          <tr class="frag"><td>توليد الإشارة</td><td>يولّد نبضات ميكروويف عالية الطاقة</td><td>يولّد ويضخّم الإشارات بالترانزستورات</td></tr>
+          <tr class="frag"><td>قوة الإخراج</td><td>قوة ذروة عالية، مناسبة للمسافات الطويلة</td><td>قوة ذروة أقل تعوّضها نبضات أطول</td></tr>
+          <tr class="frag"><td>الحجم والوزن</td><td>أكبر وأثقل بسبب المكونات</td><td>أخف وزنًا وأقل مكونات</td></tr>
+          <tr class="frag"><td>الموثوقية</td><td>أقل بسبب الأنابيب المفرّغة؛ صيانة أكثر</td><td>أكثر موثوقية مع نقاط فشل أقل</td></tr>
+          <tr class="frag"><td>التكلفة</td><td>تكلفة أولية أقل؛ صيانة أعلى</td><td>تكلفة أولية أعلى؛ صيانة أقل على المدى الطويل</td></tr>
+          <tr class="frag"><td>المرونة البيئية</td><td>قد يتأثر بالضباب والمطر</td><td>أداء أفضل عمومًا مع تمييز أفضل للأهداف</td></tr>
+          <tr class="frag"><td>دوبلر</td><td>✗ غير ممكن</td><td>✓ ممكن (متماسك الطور)</td></tr>
+          <tr class="frag"><td>التعقيد</td><td>تصميم أبسط عمومًا</td><td>أكثر تعقيدًا بسبب الوظائف المدمجة</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ فاصل ٥ ═══ -->
+<section class="slide title-slide divider" data-title="المحطة ٥ — النطاقات والشعاع" data-ch="5" data-notes="محطة ٥ من ٧.">
+  <img class="bgimg" src="media/garmin.jpg" alt="">
+  <div class="hero"><span class="tag">المحطة ٥ من ٧</span><h1>النطاقات <span>والشعاع</span></h1><p class="sub">X-band و S-band · شكل الشعاع وخصائصه · تأثير دوبلر</p><div class="roadmap mini rm-auto"></div></div>
+  <div class="hint"></div>
+</section>
+
+<!-- ═══ 18 النطاقات ═══ -->
+<section class="slide" data-title="النطاقات Bands" data-ch="5" data-notes="اختر X أو S: تتغير الموجة وحجم الهوائي وتأثير المطر. الميل البحري 1852 م.">
+  <header><span class="k">١٠ <small>· ١ من ٣</small></span><h2>النطاقات التي يعمل عليها الرادار — Bands</h2><span class="src">الشريحة ١٥</span></header>
+  <div class="body two wide">
+    <div class="panel">
+      <div class="ptitle">اختر النطاق وشاهد الموجة <small id="bandTitle">X-band</small></div>
+      <div class="bandsel" style="margin-bottom:.5rem"><button class="on" data-b="x">X-band · 8–12 GHz</button><button data-b="s">S-band · 2–4 GHz</button></div>
+      <svg viewBox="0 0 640 200" id="bandSvg" role="img" aria-label="الموجة الحاملة">
+        <path id="carrier" d="" fill="none" stroke="#ffcf6e" stroke-width="2.5"/>
+        <g id="lamb"><line x1="0" y1="105" x2="0" y2="105" stroke="#38bdf8" stroke-width="2"/><text x="0" y="122" text-anchor="middle" font-size="12" fill="#38bdf8" id="lambT">λ</text></g>
+        <g id="rain" fill="#7ec9e3"><circle cx="120" cy="40" r="2"/><circle cx="150" cy="60" r="2"/><circle cx="180" cy="35" r="2"/><circle cx="210" cy="65" r="2"/><circle cx="240" cy="45" r="2"/><circle cx="270" cy="58" r="2"/><text x="195" y="22" text-anchor="middle" font-size="12" fill="#7ec9e3" id="rainT">مطر</text></g>
+        <g id="antSz"><rect id="antRect" x="470" y="150" width="140" height="10" rx="4" fill="#dbe7f1"/><text x="540" y="180" text-anchor="middle" font-size="12" fill="#9aa9bd" id="antT">حجم الهوائي</text></g>
+      </svg>
+      <div class="readout"><div>التردد<b id="bF">8–12 GHz</b></div><div>طول الموجة<b id="bL">2.5–3.75 cm</b></div><div>الاستخدام<b id="bU" style="direction:rtl;text-align:start;font-size:.95rem">القوارب الصغيرة والمتوسطة</b></div></div>
+    </div>
+    <div>
+      <p class="lead frag"><strong>X-band:</strong> 8–12 GHz، طول موجة 2.5–3.75 cm. يُستخدم في القوارب الصغيرة والمتوسطة.</p>
+      <p class="lead frag"><strong>S-band:</strong> 2–4 GHz، طول موجة 7.5–15 cm. للسفن الكبيرة (حسب حجم الهوائي)، ويعمل أفضل في الظروف المناخية الصعبة.</p>
+      <div class="note frag"><b>ملاحظة:</b> الميل البحري وحدة قياس المسافات في المياه = <span dir="ltr">1,852 m</span>، بينما الميل البري ≈ <span dir="ltr">1,609.34 m</span>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 18b من الموجة إلى النبضة ═══ -->
+<section class="slide" data-title="من الموجة إلى النبضة — أشكال الإشارة" data-ch="5" data-notes="اضغط كل سطر: (a) الموجة الأساسية (b) موجة تتغير سرعتها = الحالة الصلبة (c) بوابة تشغيل/إطفاء (d) الغلاف (e) الناتج الفعلي. الطاقة = القوة × مدة النبضة.">
+  <header><span class="k">١٠ <small>· ٢ من ٣</small></span><h2>من الموجة إلى النبضة — أشكال الإشارة</h2><span class="src">الشريحة ١٥</span></header>
+  <div class="body two wide">
+    <div class="panel">
+      <div class="ptitle">أشكال الإشارة الخمسة <small>اضغط سطرًا في القائمة ليضيء</small></div>
+      <svg viewBox="0 0 900 400" id="wavesSvg" style="max-height:52vh" role="img" aria-label="أشكال الإشارة"></svg>
+    </div>
+    <ul class="biglist" id="wavesList" style="font-size:.78em;gap:.2rem;line-height:1.45">
+      <li class="clickable frag" data-k="a"><span class="n">a</span><div><b>الموجة المستمرة (Carrier)</b><span>النغمة الأساسية بتردد ثابت — في X-band حوالي 9.4 GHz. لوحدها لا تعطي مسافة.</span></div></li>
+      <li class="clickable frag" data-k="b"><span class="n">b</span><div><b>موجة تتغير سرعتها (Chirp)</b><span>تبدأ بطيئة وتسرع داخل النبضة — هذا أسلوب <b>الحالة الصلبة</b>: نبضة طويلة بطاقة كبيرة، ثم يُضغط الصدى ليصير كأنه قصير.</span></div></li>
+      <li class="clickable frag" data-k="c"><span class="n">c</span><div><b>بوابة التشغيل (Pulse)</b><span>مفتاح: فوق = أرسل، تحت = اسكت واسمع. عرض النبضة قصير ووقت الاستماع طويل.</span></div></li>
+      <li class="clickable frag" data-k="d"><span class="n">d</span><div><b>الغلاف (Envelope)</b><span>شكل قوة النبضة مع الزمن — يرتفع ثم يهبط.</span></div></li>
+      <li class="clickable frag" data-k="e"><span class="n">e</span><div><b>الناتج: نبضة ميكروويف</b><span>الموجة × البوابة = ما يخرج فعلًا من الهوائي: قطع قصيرة من الموجة تفصلها فترات صمت.</span></div></li>
+    </ul>
+    <div class="note frag" style="grid-column:1/-1"><b>الطاقة ببساطة:</b> طاقة النبضة = قوتها × مدتها. الماغنترون: قوة ضخمة × مدة قصيرة جدًا. الحالة الصلبة: قوة أقل × مدة أطول (chirp) — <b>الطاقة الواصلة للهدف متقاربة</b>، لهذا يشوفان نفس المسافة تقريبًا.</div>
+  </div>
+</section>
+
+<!-- ═══ 19 مقارنة النطاقين ═══ -->
+<section class="slide" data-title="مقارنة X-band و S-band" data-ch="5" data-notes="صف صف بالنقر.">
+  <header><span class="k">١٠ <small>· ٣ من ٣</small></span><h2>مقارنة بين النطاقين</h2><span class="src">الشريحة ١٦</span></header>
+  <div class="body">
+    <div class="panel">
+      <table class="cmp">
+        <thead><tr><th>الميزة</th><th>رادار X-band</th><th>رادار S-band</th></tr></thead>
+        <tbody>
+          <tr class="frag"><td>نطاق التردد</td><td>8 إلى 12 جيجاهرتز</td><td>2 إلى 4 جيجاهرتز</td></tr>
+          <tr class="frag"><td>طول الموجة</td><td>أقصر (2.5 – 3.75 cm)</td><td>أطول (7.5 – 15 cm)</td></tr>
+          <tr class="frag"><td>الدقة</td><td>أعلى؛ أفضل للأجسام الصغيرة والتفاصيل الدقيقة</td><td>أقل؛ أفضل للرؤية الوضعية على المدى الطويل</td></tr>
+          <tr class="frag"><td>التشتت</td><td>أكثر عرضة للاختناق من الأمطار</td><td>أقل تأثرًا بالأمطار؛ فعّال للأهداف الكبيرة في البحار القاسية</td></tr>
+          <tr class="frag"><td>إدارة الفوضى</td><td>يلتقط فوضى أكثر لكن بمعلومات تفصيلية</td><td>أفضل في إدارة فوضى البحر بالمياه المفتوحة</td></tr>
+          <tr class="frag"><td>حالات الاستخدام</td><td>الملاحة عالية الدقة في المياه المكتظة</td><td>الملاحة على المدى الطويل وتجنب التصادم</td></tr>
+          <tr class="frag"><td>حجم الهوائي</td><td>هوائيات أقصر — أنظمة أكثر إحكامًا</td><td>هوائيات أطول بسبب طول الموجة</td></tr>
+          <tr class="frag"><td>التكلفة</td><td>أكثر تكلفة عادةً</td><td>أقل تكلفة عمومًا</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 20 شعاع الرادار — التعريف ═══ -->
+<section class="slide" data-title="إشعاع الرادار — التعريف" data-ch="5" data-notes="الشعاع مثل ضوء الكشّاف: أقوى في المنتصف، وعند الحافتين نصف القوة. أي شيء خارج الحافتين الرادار ما يشوفه.">
+  <header><span class="k">١١ <small>· ١ من ٢</small></span><h2>إشعاع الرادار (Radar Beam) — ما هو؟</h2><span class="src">الشريحة ١٧</span></header>
+  <div class="body two wide">
+    <div class="panel frag">
+      <div class="ptitle">شكل الشعاع من الجانب <small>أقوى في المنتصف، نصف القوة عند الحافتين</small></div>
+      <svg viewBox="0 0 640 260" role="img" aria-label="شعاع الرادار بحافتي نصف القدرة">
+        <path d="M0 200 q30 -8 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t40 0 V260 H0Z" fill="#0a1628"/>
+        <path d="M560 120 L60 40 L60 200 Z" fill="#38bdf8" opacity=".12"/>
+        <path d="M560 120 L60 80 L60 160 Z" fill="#38bdf8" opacity=".18"/>
+        <path d="M560 120 L60 40" stroke="#dbe7f1" stroke-width="2"/><path d="M560 120 L60 200" stroke="#dbe7f1" stroke-width="2"/><path d="M560 120 L60 120" stroke="#ffcf6e" stroke-width="3"/>
+        <text x="300" y="60" text-anchor="middle" font-size="13" fill="#dbe7f1">الحافة العليا — نصف القوة</text>
+        <text x="300" y="112" text-anchor="middle" font-size="15" fill="#ffcf6e" font-weight="600">المنتصف — أقصى قوة</text>
+        <text x="300" y="190" text-anchor="middle" font-size="13" fill="#dbe7f1">الحافة السفلى — نصف القوة</text>
+        <rect x="550" y="80" width="14" height="120" fill="#6b86a3"/><rect x="540" y="72" width="34" height="10" rx="3" fill="#ffcf6e"/>
+        <path d="M60 150 h70 l-10 20 h-50 z" fill="#f5a524"/><rect x="85" y="110" width="12" height="40" fill="#ffcf6e"/>
+        <text x="320" y="245" text-anchor="middle" font-size="12" fill="#9aa9bd">خارج الحافتين القوة ضعيفة جدًا — الرادار «لا يرى» هناك</text>
+      </svg>
+    </div>
+    <div style="display:grid;gap:.7rem">
+      <div class="card frag"><h3>التعريف</h3><p>شعاع الرادار هو <b>انبعاث موجّه</b> لموجات الراديو يطلقه نظام الرادار — مثل ضوء الكشّاف: لا ينتشر في كل الاتجاهات بل في «شفرة» محددة.</p></div>
+      <div class="card frag"><h3 style="color:var(--cyan)">لماذا «نصف القوة»؟</h3><p>الشعاع ليس له حدود حادة. نتفق أن حدوده هي المكان الذي تنزل فيه القوة إلى <b>النصف</b> — والزاوية بين الحدين اسمها <b>عرض الشعاع</b>.</p></div>
+      <div class="note frag"><b>مثال:</b> كشّاف اليد: أقوى ضوء في المنتصف، وعند الأطراف يخفت. عرض الشعاع هو زاوية الدائرة المضيئة.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 20b أنواع الشعاع وخصائصه ═══ -->
+<section class="slide" data-title="إشعاع الرادار — الأنواع والخصائص" data-ch="5" data-notes="الأنواع الثلاثة كما بالمذكرة، وأن البحري مزيج: ضيق أفقيًا عريض عموديًا. الخصائص خمس — كل واحدة بجملة.">
+  <header><span class="k">١١ <small>· ٢ من ٢</small></span><h2>أنواع الشعاع وخصائصه</h2><span class="src">الشريحة ١٧</span></header>
+  <div class="body">
+    <div class="cards">
+      <div class="card frag"><div class="ph" style="aspect-ratio:16/7"><svg viewBox="0 0 320 140"><rect width="320" height="140" fill="#06131f"/><rect x="150" y="118" width="20" height="8" fill="#9aa9bd"/><path d="M160 118 L120 20 L200 20 Z" fill="#38bdf8" opacity=".35"/><path d="M160 118 L120 20 M160 118 L200 20" stroke="#38bdf8" stroke-width="2"/><text x="160" y="135" text-anchor="middle" font-size="10" fill="#9aa9bd">شعاع يرتفع للأعلى</text></svg></div><h3>الشعاع العمودي</h3><p>موجّه للأعلى — رادارات الطقس تكشف به المطر والعواصف.</p></div>
+      <div class="card frag ok"><div class="ph" style="aspect-ratio:16/7"><svg viewBox="0 0 320 140"><rect width="320" height="140" fill="#06131f"/><rect x="280" y="66" width="8" height="18" fill="#9aa9bd"/><path d="M280 75 L40 55 L40 95 Z" fill="#4ade80" opacity=".35"/><path d="M280 75 L40 55 M280 75 L40 95" stroke="#4ade80" stroke-width="2"/><text x="160" y="130" text-anchor="middle" font-size="10" fill="#9aa9bd">شعاع يمسح الأفق</text></svg></div><h3>الشعاع الأفقي</h3><p>موجّه نحو الأفق — الملاحة واكتشاف الأهداف ومراقبة حركة السفن. <b>هذا شعاعنا</b>.</p></div>
+      <div class="card frag"><div class="ph" style="aspect-ratio:16/7"><svg viewBox="0 0 320 140"><rect width="320" height="140" fill="#06131f"/><rect x="150" y="118" width="20" height="8" fill="#9aa9bd"/><path d="M160 118 L100 30 A60 14 0 0 1 220 30 Z" fill="#ffcf6e" opacity=".3"/><ellipse cx="160" cy="30" rx="60" ry="14" fill="none" stroke="#ffcf6e" stroke-width="2"/><path d="M160 118 L100 30 M160 118 L220 30" stroke="#ffcf6e" stroke-width="2"/><text x="160" y="135" text-anchor="middle" font-size="10" fill="#9aa9bd">مخروط ثلاثي الأبعاد</text></svg></div><h3>الشعاع المخروطي</h3><p>مزيج من العمودي والأفقي — منظور ثلاثي الأبعاد لمسح البيئة المحيطة (رادارات التتبع).</p></div>
+    </div>
+    <div class="cards" style="grid-template-columns:repeat(5,1fr)">
+      <div class="card frag"><div class="ico">📐</div><h3 style="font-size:1.05rem">عرض الشعاع</h3><p>ضيق = دقة أعلى ومساحة أقل. واسع = مساحة أكبر وتفاصيل أقل.</p></div>
+      <div class="card frag"><div class="ico">🔦</div><h3 style="font-size:1.05rem">الكسب العالي والمنخفض</h3><p>كسب عالٍ = شعاع أضيق يصل أبعد (كشّاف). منخفض = أوسع وأقرب (مصباح).</p></div>
+      <div class="card frag"><div class="ico">⏱️</div><h3 style="font-size:1.05rem">زمن الإقامة</h3><p>كم يبقى الشعاع على الهدف؛ أطول = نبضات أكثر = صدى أوضح.</p></div>
+      <div class="card frag"><div class="ico">📡</div><h3 style="font-size:1.05rem">تصميم الهوائي</h3><p>طول الهوائي وشكله يحددان شكل الشعاع: الأطول = الأضيق.</p></div>
+      <div class="card frag"><div class="ico">🚑</div><h3 style="font-size:1.05rem">تأثير دوبلر</h3><p>تغيّر تردد الصدى يكشف هل الهدف يقترب أم يبتعد — الشريحة التالية.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 21 دوبلر ═══ -->
+<section class="slide" data-title="تأثير دوبلر" data-ch="5" data-notes="سيارة الإسعاف: الموجات تنضغط أمامها (تردد أعلى) وتتمدد خلفها. الرادار يقرأ هذا على الصدى. حالة صلبة فقط.">
+  <header><span class="k">١٢</span><h2>تأثير دوبلر (Doppler Effect)</h2><span class="src">الشريحة ١٨</span></header>
+  <div class="body two eq">
+    <div style="display:grid;gap:.7rem">
+      <div class="panel frag">
+        <div class="ptitle">المبدأ <small>مصدر متحرك يضغط الموجات أمامه</small></div>
+        <svg viewBox="0 0 640 200" role="img" aria-label="تأثير دوبلر" id="dopSvg">
+          <rect width="640" height="200" fill="#06131f" rx="10"/>
+          <g id="dopScene">
+            <g id="dopWaves"><circle cx="330" cy="100" r="0" fill="none" stroke="#38bdf8" stroke-width="2"><animate attributeName="r" from="0" to="150" dur="4.8s" begin="0.0s" repeatCount="indefinite"/><animate attributeName="cx" from="330" to="430" dur="4.8s" begin="0.0s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;1;0" keyTimes="0;.7;1" dur="4.8s" begin="0.0s" repeatCount="indefinite"/></circle><circle cx="330" cy="100" r="0" fill="none" stroke="#38bdf8" stroke-width="2"><animate attributeName="r" from="0" to="150" dur="4.8s" begin="-0.7999999999999999s" repeatCount="indefinite"/><animate attributeName="cx" from="330" to="430" dur="4.8s" begin="-0.7999999999999999s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;1;0" keyTimes="0;.7;1" dur="4.8s" begin="-0.7999999999999999s" repeatCount="indefinite"/></circle><circle cx="330" cy="100" r="0" fill="none" stroke="#38bdf8" stroke-width="2"><animate attributeName="r" from="0" to="150" dur="4.8s" begin="-1.5999999999999999s" repeatCount="indefinite"/><animate attributeName="cx" from="330" to="430" dur="4.8s" begin="-1.5999999999999999s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;1;0" keyTimes="0;.7;1" dur="4.8s" begin="-1.5999999999999999s" repeatCount="indefinite"/></circle><circle cx="330" cy="100" r="0" fill="none" stroke="#38bdf8" stroke-width="2"><animate attributeName="r" from="0" to="150" dur="4.8s" begin="-2.4s" repeatCount="indefinite"/><animate attributeName="cx" from="330" to="430" dur="4.8s" begin="-2.4s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;1;0" keyTimes="0;.7;1" dur="4.8s" begin="-2.4s" repeatCount="indefinite"/></circle><circle cx="330" cy="100" r="0" fill="none" stroke="#38bdf8" stroke-width="2"><animate attributeName="r" from="0" to="150" dur="4.8s" begin="-3.1999999999999997s" repeatCount="indefinite"/><animate attributeName="cx" from="330" to="430" dur="4.8s" begin="-3.1999999999999997s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;1;0" keyTimes="0;.7;1" dur="4.8s" begin="-3.1999999999999997s" repeatCount="indefinite"/></circle><circle cx="330" cy="100" r="0" fill="none" stroke="#38bdf8" stroke-width="2"><animate attributeName="r" from="0" to="150" dur="4.8s" begin="-4.0s" repeatCount="indefinite"/><animate attributeName="cx" from="330" to="430" dur="4.8s" begin="-4.0s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;1;0" keyTimes="0;.7;1" dur="4.8s" begin="-4.0s" repeatCount="indefinite"/></circle></g>
+            <g id="dopSrc"><rect x="300" y="86" width="60" height="28" rx="6" fill="#f5a524"/><circle cx="312" cy="118" r="6" fill="#dbe7f1"/><circle cx="348" cy="118" r="6" fill="#dbe7f1"/><path d="M296 100 h-30" stroke="#ffcf6e" stroke-width="3" marker-end="url(#ar)"/></g>
+          </g>
+          <g transform="translate(34 100)"><rect x="-14" y="-10" width="28" height="20" rx="3" fill="#22354d" stroke="#4ade80"/><line x1="0" y1="-10" x2="0" y2="-30" stroke="#dbe7f1" stroke-width="2"/><rect x="-10" y="-34" width="20" height="5" rx="2" fill="#ffcf6e"/><text y="30" text-anchor="middle" font-size="11" fill="#4ade80">الرادار</text></g>
+          <text x="320" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#f87171" id="dopMsg">الهدف يقترب من الرادار — الموجات أمامه متقاربة ← الرادار يستقبل ترددًا أعلى</text>
+          <text x="320" y="190" text-anchor="middle" font-size="12" fill="#9aa9bd">الرادار يقارن تردد الصدى بتردد ما أرسله — أعلى = يقترب · أقل = يبتعد</text>
+        </svg>
+        <div class="ctrls" style="justify-content:center"><button class="btn" id="dopBtn">🔄 اجعله يبتعد</button></div>
+      </div>
+      <p class="lead frag" style="max-width:60ch">تأثير دوبلر هو <strong>التغير في التردد</strong> (أو الطول الموجي) لموجة بالنسبة لمراقب متحرك بالنسبة لمصدر الموجة.</p>
+    </div>
+    <div style="display:grid;gap:.7rem">
+      <div class="photo frag" style="aspect-ratio:16/9"><img src="media/doppler.jpg" alt="شاشة رادار بدوبلر"><div class="cap">الأهداف القادمة إلينا بالأحمر، والخارجة عنا بالأخضر</div></div>
+      <div class="warn frag"><b>لماذا يهمك كفني؟</b> هذه الميزة تعمل فقط في رادارات <b>الحالة الصلبة</b> (متماسكة الطور). «Doppler» في الكتالوج = حالة صلبة بالضرورة.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ فاصل ٦ ═══ -->
+<section class="slide title-slide divider" data-title="المحطة ٦ — التركيب والفك" data-ch="6" data-notes="محطة ٦ من ٧.">
+  <img class="bgimg" src="media/repair.jpg" alt="">
+  <div class="hero"><span class="tag">المحطة ٦ من ٧</span><h1>التركيب <span>والفك</span></h1><p class="sub">خطوات التركيب، خطوات الفك، وقواعد السلامة</p><div class="roadmap mini rm-auto"></div></div>
+  <div class="hint"></div>
+</section>
+
+<!-- ═══ 22 التركيب ═══ -->
+<section class="slide" data-title="تركيب جهاز الرادار" data-ch="6" data-notes="اضغط كل خطوة: تظهر القطعة على الزورق. الخطوة ٤ ترسم الكيبلات، الخطوة ٥ يبدأ المسح.">
+  <header><span class="k">١٣ <small>· ١ من ٣</small></span><h2>تركيب جهاز الرادار</h2><span class="src">الشريحة ١٩</span></header>
+  <div class="body two wide">
+    <div class="panel">
+      <div class="ptitle">ركّب الرادار خطوة خطوة <small>اضغط الخطوات بالترتيب</small></div>
+      <svg viewBox="0 0 760 320" id="instSvg" role="img" aria-label="تركيب الرادار على الزورق">
+        <path d="M0 250 q30 -10 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t40 0 V320 H0Z" fill="#0a1628"/>
+        <path d="M120 250 L640 250 L600 285 L170 285 Z" fill="#3b5470"/><path d="M640 250 L700 220 L640 220 Z" fill="#3b5470"/>
+        <rect x="300" y="160" width="200" height="90" rx="8" fill="#22354d" stroke="#3f6a8a"/>
+        <text x="400" y="200" text-anchor="middle" font-size="12" fill="#9aa9bd" id="inst-hint">غرفة القيادة</text>
+        <!-- ١ الموقع -->
+        <g id="inst-1" class="hl" style="opacity:0;transition:opacity .5s"><rect x="410" y="172" width="70" height="40" rx="3" fill="none" stroke="#ffcf6e" stroke-dasharray="5 4"/><text x="445" y="228" text-anchor="middle" font-size="11" fill="#ffcf6e">موقع الشاشة: قرب القيادة، بعيد عن الماء</text></g>
+        <!-- ٢ الشاشة -->
+        <g id="inst-2" class="hl" style="opacity:0;transition:opacity .5s"><rect x="410" y="172" width="70" height="40" rx="3" fill="#06131f" stroke="#4ade80"/><circle cx="445" cy="192" r="13" fill="none" stroke="#4ade80" stroke-opacity=".6"/><g fill="#9aa9bd"><circle cx="414" cy="176" r="2"/><circle cx="476" cy="176" r="2"/><circle cx="414" cy="208" r="2"/><circle cx="476" cy="208" r="2"/></g></g>
+        <!-- ٣ الهوائي -->
+        <g id="inst-3" class="hl" style="opacity:0;transition:opacity .5s"><rect x="396" y="70" width="8" height="90" fill="#6b86a3"/><rect x="350" y="56" width="100" height="16" rx="8" fill="#ffcf6e"/><path d="M445 56 l8 -6 v12 z" fill="#f87171"/><text x="400" y="44" text-anchor="middle" font-size="11" fill="#ffcf6e">أعلى الزورق · علامة المقدمة للأمام</text></g>
+        <!-- ٤ الكيبلات -->
+        <g id="inst-4" class="hl" style="opacity:0;transition:opacity .5s"><path d="M404 72 q30 40 20 90 q-5 20 20 30" fill="none" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6 5" class="flow"/><rect x="540" y="258" width="40" height="20" rx="3" fill="#22354d" stroke="#f5a524"/><path d="M480 205 q50 20 60 53" fill="none" stroke="#f87171" stroke-width="2"/><path d="M484 208 q50 22 56 52" fill="none" stroke="#dbe7f1" stroke-width="2"/><rect x="520" y="238" width="10" height="7" fill="#ffcf6e"/><text x="560" y="300" text-anchor="middle" font-size="11" fill="#9aa9bd">بطارية 12/24 V · فيوز · أحمر + · أسود −</text></g>
+        <!-- ٥ الاختبار -->
+        <g id="inst-5" class="hl" style="opacity:0;transition:opacity .5s"><path d="M352 64 L40 30 L40 100 Z" fill="#38bdf8" opacity=".18"><animate attributeName="opacity" values=".05;.3;.05" dur="1.6s" repeatCount="indefinite"/></path><g transform="translate(445 192)"><g class="sweep"><path d="M0 0 L0 -12 A12 12 0 0 1 8 -9 Z" fill="#4ade80" opacity=".7"/></g></g><text x="150" y="130" text-anchor="middle" font-size="11" fill="#4ade80">Transmit ✓ · معايرة الاتجاه على هدف معروف</text></g>
+      </svg>
+    </div>
+    <ul class="biglist" id="instList" style="font-size:.88em;gap:.3rem">
+      <li class="clickable frag" data-n="1"><span class="n">١</span><div><b>اختيار الموقع المناسب</b><span>داخل القارب قريبًا من محطة القيادة، بعيدًا عن الماء والحرارة.</span></div></li>
+      <li class="clickable frag" data-n="2"><span class="n">٢</span><div><b>تثبيت شاشة الرادار</b><span>بالمسامير أو البراغي بشكل آمن لا يهتز.</span></div></li>
+      <li class="clickable frag" data-n="3"><span class="n">٣</span><div><b>تثبيت الهوائي</b><span>أعلى الزورق، علامة المقدمة للأمام، بعيدًا عن العوائق المعدنية وفوق رؤوس الطاقم.</span></div></li>
+      <li class="clickable frag" data-n="4"><span class="n">٤</span><div><b>توصيل الكيبلات</b><span>كيبل البيانات بين الهوائي والشاشة، وكيبل الطاقة بفيوز: أحمر للموجب، أسود للسالب.</span></div></li>
+      <li class="clickable frag" data-n="5"><span class="n">٥</span><div><b>اختبار الجهاز</b><span>تشغيل، Transmit، اختبار الإرسال والاستقبال، ومعايرة خط الاتجاه على هدف معروف.</span></div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 23 الفك ═══ -->
+<section class="slide" data-title="فك وصيانة الرادار" data-ch="6" data-notes="اضغط الخطوات بالترتيب: يطفأ، تنفك الكيبلات، تطلع البراغي، يرتفع الغطاء، ثم التنظيف. ذكّرهم: قبل الخطوة ٣ تفريغ المكثفات.">
+  <header><span class="k">١٣ <small>· ٢ من ٣</small></span><h2>فك وصيانة جهاز الرادار</h2><span class="src">الشريحة ٢٠</span></header>
+  <div class="body two wide">
+    <div class="panel">
+      <div class="ptitle">افتح وحدة الهوائي خطوة خطوة <small>اضغط الخطوات بالترتيب</small></div>
+      <svg viewBox="0 0 760 320" id="disSvg" role="img" aria-label="فك وحدة الهوائي">
+        <!-- القاعدة -->
+        <rect x="200" y="200" width="360" height="60" rx="10" fill="#22354d" stroke="#3f6a8a"/>
+        <!-- البوردات الداخلية -->
+        <g id="dis-inside" style="opacity:0;transition:opacity .6s"><rect x="230" y="212" width="90" height="36" rx="4" fill="#1f8a4c"/><rect x="340" y="208" width="60" height="40" rx="4" fill="#b45309"/><rect x="420" y="212" width="110" height="36" rx="4" fill="#1f8a4c"/><text x="275" y="235" text-anchor="middle" font-size="10" fill="#fff">Modulator</text><text x="370" y="232" text-anchor="middle" font-size="10" fill="#fff">Magnetron</text><text x="475" y="235" text-anchor="middle" font-size="10" fill="#fff">IF</text></g>
+        <!-- الغطاء -->
+        <g id="dis-cover" style="transition:transform .8s cubic-bezier(.2,.8,.2,1)"><path d="M200 200 q180 -120 360 0 Z" fill="#dbe7f1"/><text x="380" y="160" text-anchor="middle" font-size="12" fill="#22354d" font-weight="600">غطاء وحدة الهوائي</text></g>
+        <!-- البراغي -->
+        <g id="dis-screws" style="transition:transform .6s, opacity .6s"><g fill="#9aa9bd"><circle cx="225" cy="230" r="5"/><circle cx="300" cy="230" r="5"/><circle cx="380" cy="230" r="5"/><circle cx="460" cy="230" r="5"/><circle cx="535" cy="230" r="5"/></g></g>
+        <!-- الكيبلات -->
+        <g id="dis-cables" style="transition:opacity .6s"><path d="M560 240 q60 0 80 40" fill="none" stroke="#38bdf8" stroke-width="4"/><path d="M560 250 q60 10 90 40" fill="none" stroke="#f87171" stroke-width="3"/><text x="660" y="300" text-anchor="middle" font-size="11" fill="#9aa9bd">كيبل البيانات + الطاقة</text></g>
+        <!-- الطاقة -->
+        <g id="dis-power"><rect x="80" y="230" width="60" height="30" rx="4" fill="#22354d" stroke="#f5a524"/><text x="110" y="250" text-anchor="middle" font-size="11" fill="#dbe7f1">12 V</text><path d="M140 245 H200" stroke="#f5a524" stroke-width="3" id="dis-powerline"/><text x="110" y="280" text-anchor="middle" font-size="11" fill="#4ade80" id="dis-powerT">الطاقة موصولة</text></g>
+        <!-- الفرشاة -->
+        <g id="dis-brush" style="opacity:0;transition:opacity .5s"><rect x="330" y="120" width="12" height="40" rx="3" fill="#ffcf6e" transform="rotate(-25 336 140)"/><rect x="318" y="150" width="36" height="14" rx="3" fill="#9aa9bd" transform="rotate(-25 336 157)"/><text x="380" y="110" text-anchor="middle" font-size="11" fill="#ffcf6e">فرشاة ناعمة — لا ماء ولا كيماويات</text></g>
+        <text x="380" y="300" text-anchor="middle" font-size="12" fill="#ffcf6e" id="dis-msg">الجهاز مركّب وشغّال — ابدأ بالخطوة ١</text>
+      </svg>
+    </div>
+    <ul class="biglist" id="disList" style="font-size:.88em;gap:.3rem">
+      <li class="clickable frag" data-n="1"><span class="n">١</span><div><b>إطفاء الجهاز وفصل الكهرباء</b><span>افصل البطارية أو كيبل الطاقة — لمنع التلف أو الصدمة.</span></div></li>
+      <li class="clickable frag" data-n="2"><span class="n">٢</span><div><b>فك الهوائي والكيبلات المتصلة</b><span>أزل كل الكيبلات — وصوّرها قبل الفك.</span></div></li>
+      <li class="clickable frag" data-n="3"><span class="n">٣</span><div><b>إزالة البراغي الخارجية</b><span>عادة على الجانب السفلي — بالمفك المناسب، واحفظها.</span></div></li>
+      <li class="clickable frag" data-n="4"><span class="n">٤</span><div><b>فتح الغلاف الخارجي</b><span>بأداة مسطحة برفق — بلا قوة مفرطة.</span></div></li>
+      <li class="clickable frag" data-n="5"><span class="n">٥</span><div><b>تنظيف المكونات</b><span>فرشاة صغيرة للأتربة — لا ماء ولا مواد كيميائية.</span></div></li>
+    </ul>
+    <div class="photo frag" style="grid-column:1/-1;height:110px;width:100%"><img src="media/repair.jpg" alt="فني يفك وحدة رادار" style="object-position:center 40%"><div class="cap">قفازات، أدوات مناسبة، وتوثيق بالصور قبل الفك — والسلامة في الشريحة التالية</div></div>
+  </div>
+</section>
+
+<!-- ═══ 24 السلامة ═══ -->
+<section class="slide" data-title="ملاحظات السلامة" data-ch="6" data-notes="أهم شريحة للفني: تفريغ المكثفات، المغناطيس، لا إرسال والغطاء مفتوح.">
+  <header><span class="k">١٣ <small>· ٣ من ٣</small></span><h2>ملاحظة — السلامة قبل كل شيء</h2><span class="src">الشريحة ٢١ + إضافات</span></header>
+  <div class="body two eq">
+    <div class="card frag"><h3 style="color:var(--cyan)">من المذكرة</h3><p>▸ التعامل بحذر مع المكونات الإلكترونية لتجنب تلفها.<br>▸ يمكنك ارتداء قفازات إذا كان متاحًا.<br>▸ تفقّد كيبلات الجهاز بصريًا أو التصوير أثناء الفك لمعرفة كيفية إعادة تركيبها بسهولة.<br>▸ إذا كنت تشعر بعدم الثقة في فك الجهاز، فالأفضل الاستشارة لتجنب أي ضرر.</p></div>
+    <div class="card bad frag"><h3>🛑 خاص برادار الماغنترون</h3><p>▸ <b>جهد عالٍ مخزّن:</b> مكثفات المودوليتر تحتفظ بمئات إلى آلاف الفولت بعد الإطفاء — انتظر دقائق ثم فرّغها بأداة معزولة.<br>▸ <b>مغناطيس قوي:</b> الماغنترون يسحب المفكات ويتلف الساعات والبطاقات والهواتف.<br>▸ <b>لا إرسال والغطاء مفتوح:</b> ولا أحد أمام الهوائي أثناء الاختبار.<br>▸ <b>الموتور:</b> أبعد الأصابع عن التروس عند اختبار الدوران.</p></div>
+    <div class="panel frag" style="grid-column:1/-1">
+      <svg viewBox="0 0 900 90" role="img" aria-label="تسلسل السلامة">
+        <g font-size="14" font-weight="600" fill="#0b1220">
+          <rect x="740" y="20" width="150" height="50" rx="10" fill="#ffcf6e"/><text x="815" y="50" text-anchor="middle">١ إطفاء + فصل</text>
+          <rect x="560" y="20" width="150" height="50" rx="10" fill="#ff8a5c"/><text x="635" y="50" text-anchor="middle">٢ انتظر دقائق</text>
+          <rect x="380" y="20" width="150" height="50" rx="10" fill="#f87171"/><text x="455" y="50" text-anchor="middle">٣ فرّغ المكثفات</text>
+          <rect x="200" y="20" width="150" height="50" rx="10" fill="#a7f3c4"/><text x="275" y="50" text-anchor="middle">٤ أبعد الحديد</text>
+          <rect x="20" y="20" width="150" height="50" rx="10" fill="#4ade80"/><text x="95" y="50" text-anchor="middle">٥ ابدأ الفك</text>
+        </g>
+        <g stroke="#9aa9bd" stroke-width="2" marker-end="url(#ar)"><line x1="740" y1="45" x2="712" y2="45"/><line x1="560" y1="45" x2="532" y2="45"/><line x1="380" y1="45" x2="352" y2="45"/><line x1="200" y1="45" x2="172" y2="45"/></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ فاصل ٧ ═══ -->
+<section class="slide title-slide divider" data-title="المحطة ٧ — الشاشة" data-ch="7" data-notes="محطة ٧ من ٧ — الأخيرة.">
+  <img class="bgimg" src="media/display1.jpg" alt="">
+  <div class="hero"><span class="tag">المحطة ٧ من ٧</span><h1>شاشة الرادار <span>والأعطال الشائعة</span></h1><p class="sub">Transmit/Standby · Gain · Sea Clutter · Rain Clutter · تشخيص الأعطال</p><div class="roadmap mini rm-auto"></div></div>
+  <div class="hint"></div>
+</section>
+
+<!-- ═══ 25 الشاشة ═══ -->
+<section class="slide" data-title="شاشة الرادار — الإعدادات" data-ch="7" data-notes="جرّب Sea Clutter إلى الأقصى: يختفي القارب الصغير القريب. هذي لحظة «آها» للمشغّل.">
+  <header><span class="k">١٤</span><h2>شاشة الرادار (Display) — أهم الخيارات</h2><span class="src">الشريحة ٢٢</span></header>
+  <div class="body two wide">
+    <div class="panel">
+      <div class="ptitle">جرّب الإعدادات بنفسك <small>Gain · Sea Clutter</small></div>
+      <svg viewBox="0 0 640 300" id="scope" role="img" aria-label="شاشة رادار تفاعلية">
+        <rect width="640" height="300" rx="14" fill="#06131f"/>
+        <g transform="translate(320 150)">
+          <circle r="135" fill="none" stroke="#4ade80" stroke-opacity=".35"/><g id="sc-rings"><circle r="100" fill="none" stroke="#4ade80" stroke-opacity=".25" stroke-dasharray="3 4"/><circle r="65" fill="none" stroke="#4ade80" stroke-opacity=".25" stroke-dasharray="3 4"/><circle r="30" fill="none" stroke="#4ade80" stroke-opacity=".25" stroke-dasharray="3 4"/></g>
+          <line x1="0" y1="0" x2="0" y2="-135" stroke="#4ade80" stroke-width="2"/>
+          <g class="sweep"><path d="M0 0 L0 -135 A135 135 0 0 1 46 -127 Z" fill="#4ade80" opacity=".22"/></g>
+          <g id="sc-trails" style="display:none" fill="#4ade80" opacity=".35"><ellipse cx="72" cy="-62" rx="6" ry="3.5"/><ellipse cx="84" cy="-74" rx="5" ry="3"/><ellipse cx="-92" cy="32" rx="8" ry="4.5"/><ellipse cx="-104" cy="44" rx="7" ry="4"/></g><g id="sc-guard" style="display:none"><path d="M0 0 L-95 -95 A135 135 0 0 1 95 -95 Z" fill="#f87171" opacity=".12" stroke="#f87171" stroke-dasharray="5 4"/><text x="0" y="-118" text-anchor="middle" font-size="11" fill="#f87171">GUARD ZONE</text></g><g id="noise"></g><g id="seaC"></g>
+          <g id="tgts" fill="#4ade80"><ellipse cx="60" cy="-50" rx="7" ry="4"/><ellipse cx="-80" cy="20" rx="9" ry="5"/><ellipse cx="30" cy="90" rx="5" ry="3"/><ellipse id="weak" cx="-40" cy="-110" rx="5" ry="3"/><ellipse id="near" cx="18" cy="-14" rx="4" ry="2.5"/></g>
+          <g id="sc-ebl" style="display:none"><line x1="0" y1="0" x2="60" y2="-50" stroke="#ffcf6e" stroke-width="1.5" stroke-dasharray="6 4"/><circle r="78" fill="none" stroke="#ffcf6e" stroke-width="1.5" stroke-dasharray="6 4"/><text x="70" y="-60" font-size="11" fill="#ffcf6e" direction="ltr">EBL 050°</text><text x="-30" y="-84" font-size="11" fill="#ffcf6e" direction="ltr">VRM 3.5 nm</text></g>
+          <circle r="4" fill="#fff"/>
+        </g>
+        <g font-size="12" fill="#4ade80" direction="ltr"><text x="628" y="20" text-anchor="end">RANGE 6 nm</text><text x="12" y="20">TX</text><text x="628" y="288" text-anchor="end" id="scopeSt">GAIN 50 · SEA 20</text></g>
+        <text x="320" y="288" text-anchor="middle" font-size="12" fill="#ffcf6e" id="scopeMsg"></text>
+      </svg>
+      <div class="ctrls" style="gap:.4rem"><button class="btn sc-t" data-t="rings">حلقات المسافة</button><button class="btn ghost sc-t" data-t="ebl">EBL / VRM</button><button class="btn ghost sc-t" data-t="trails">الأثر</button><button class="btn ghost sc-t" data-t="guard">منطقة الحراسة</button></div>
+      <div class="ctrls"><label class="slider">الحساسية Gain: <span id="gL">50</span><input type="range" id="gain" min="0" max="100" value="50"></label><label class="slider">تشويش البحر Sea Clutter: <span id="sL">20</span><input type="range" id="sea" min="0" max="100" value="20"></label></div>
+    </div>
+    <div style="display:grid;gap:.6rem">
+      <div class="photo frag" style="aspect-ratio:16/7"><img src="media/display2.jpg" alt="وحدة عرض رادار" style="object-fit:contain;background:#fff"><div class="cap">وحدة العرض بأزرارها</div></div>
+      <ul class="biglist" style="font-size:.86em;gap:.3rem">
+        <li class="frag"><span class="n">١</span><div><b>الإرسال والانتظار (Transmit / Standby)</b><span>الخياران الأهم لبدء عملية دوران الهوائي والرصد أو إيقافها.</span></div></li>
+        <li class="frag"><span class="n">٢</span><div><b>الحساسية (Gain)</b><span>يعزّز الإشارات المستقبَلة ويؤثر على وضوح الأهداف — زيادته تجلب تشويشًا.</span></div></li>
+        <li class="frag"><span class="n">٣</span><div><b>تشويش البحر (Sea Clutter)</b><span>يقلّل الإشارات غير المرغوبة من حركة موجات البحر — المبالغة تمسح القوارب القريبة.</span></div></li>
+        <li class="frag"><span class="n">٤</span><div><b>تشويش المطر (Rain Clutter)</b><span>يقلّل الإشارات الناتجة عن الهطول مثل المطر أو الثلج.</span></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 25b الأعطال ١ ═══ -->
+<section class="slide" data-title="الأعطال الشائعة — ١: أعطال الصورة" data-ch="7" data-notes="اسأل القاعة عن كل عطل قبل إظهار البطاقة. لاحظ أن أول سببين لعطل «لا أهداف» إعدادات شاشة شرحناها للتو — مو عطل جهاز.">
+  <header><span class="k">١٥ <small>· ١ من ٢</small></span><h2>الأعطال الشائعة — أعطال الصورة</h2><span class="src">إضافة — الصيانة</span></header>
+  <div class="body">
+    <div class="cards">
+      <div class="card frag"><div class="ph" style="aspect-ratio:16/9"><svg viewBox="0 0 320 180" role="img"><rect width="320" height="180" fill="#06131f"/><g transform="translate(160 92)" opacity="1"><circle r="70" fill="#04101a" stroke="#4ade80" stroke-opacity=".5"/><circle r="46" fill="none" stroke="#4ade80" stroke-opacity=".25" stroke-dasharray="3 4"/><circle r="23" fill="none" stroke="#4ade80" stroke-opacity=".25" stroke-dasharray="3 4"/><line x1="0" y1="0" x2="0" y2="-70" stroke="#4ade80" stroke-width="1.5"/><g class="sweep"><path d="M0 0 L0 -70 A70 70 0 0 1 24 -66 Z" fill="#4ade80" opacity=".2"/></g><circle r="3" fill="#fff"/></g><rect x="232" y="12" width="76" height="24" rx="6" fill="#f5a524"/><text x="270" y="29" text-anchor="middle" font-size="13" font-weight="700" fill="#0b1220" direction="ltr">STBY ?</text><text x="160" y="176" text-anchor="middle" font-size="11" fill="#9aa9bd">شاشة شغّالة… بلا أي هدف</text></svg></div><h3 style="font-size:clamp(1rem,1.8vw,1.3rem)">١ · الشاشة تعمل ولا توجد أهداف</h3><p><b style="color:var(--red)">السبب المحتمل:</b> الوضع Standby، أو Gain منخفض، أو الماغنترون ضعيف.</p><p><b style="color:var(--green)">أول شيء تفحصه:</b> وضع Transmit ← Gain ← مؤشر Tune.</p></div>
+      <div class="card frag"><div class="ph" style="aspect-ratio:16/9"><svg viewBox="0 0 320 180" role="img"><rect width="320" height="180" fill="#06131f"/><g transform="translate(235 88)" opacity="1"><circle r="58" fill="#04101a" stroke="#4ade80" stroke-opacity=".5"/><circle r="38" fill="none" stroke="#4ade80" stroke-opacity=".25" stroke-dasharray="3 4"/><circle r="19" fill="none" stroke="#4ade80" stroke-opacity=".25" stroke-dasharray="3 4"/><line x1="0" y1="0" x2="0" y2="-58" stroke="#4ade80" stroke-width="1.5"/><g fill="#4ade80"><ellipse cx="22" cy="-20" rx="6" ry="3.5"/><ellipse cx="-26" cy="10" rx="7" ry="4"/><ellipse cx="10" cy="30" rx="4" ry="2.5"/></g><circle r="3" fill="#fff"/></g><g transform="translate(85 88)" opacity="1"><circle r="58" fill="#04101a" stroke="#4ade80" stroke-opacity=".5"/><circle r="38" fill="none" stroke="#4ade80" stroke-opacity=".25" stroke-dasharray="3 4"/><circle r="19" fill="none" stroke="#4ade80" stroke-opacity=".25" stroke-dasharray="3 4"/><line x1="0" y1="0" x2="0" y2="-58" stroke="#4ade80" stroke-width="1.5"/><g fill="#4ade80" opacity=".22"><ellipse cx="22" cy="-20" rx="6" ry="3.5"/><ellipse cx="-26" cy="10" rx="7" ry="4"/><ellipse cx="10" cy="30" rx="4" ry="2.5"/></g><circle r="3" fill="#fff"/></g><path d="M172 88 H150" stroke="#f5a524" stroke-width="3"/><path d="M152 80 l-10 8 l10 8" fill="none" stroke="#f5a524" stroke-width="3"/><text x="235" y="168" text-anchor="middle" font-size="11" fill="#9aa9bd">قبل</text><text x="85" y="168" text-anchor="middle" font-size="11" fill="#f5a524">بعد آلاف الساعات</text></svg></div><h3 style="font-size:clamp(1rem,1.8vw,1.3rem)">٢ · الصورة تبهت تدريجيًا</h3><p><b style="color:var(--red)">السبب المحتمل:</b> الماغنترون انتهى عمره (قطعة تُستهلك).</p><p><b style="color:var(--green)">أول شيء تفحصه:</b> ساعات التشغيل ومؤشر Tune — ثم التبديل.</p></div>
+      <div class="card frag"><div class="ph" style="aspect-ratio:16/9"><svg viewBox="0 0 320 180" role="img"><rect width="320" height="180" fill="#06131f"/><g transform="translate(160 92)" opacity="1"><circle r="70" fill="#04101a" stroke="#4ade80" stroke-opacity=".5"/><circle r="46" fill="none" stroke="#4ade80" stroke-opacity=".25" stroke-dasharray="3 4"/><circle r="23" fill="none" stroke="#4ade80" stroke-opacity=".25" stroke-dasharray="3 4"/><line x1="0" y1="0" x2="0" y2="-70" stroke="#4ade80" stroke-width="1.5"/><ellipse cx="0" cy="-48" rx="7" ry="4" fill="none" stroke="#9aa9bd" stroke-dasharray="3 3"/><ellipse cx="30" cy="-38" rx="7" ry="4" fill="#f87171"/><path d="M0 -30 A30 30 0 0 1 19 -23" fill="none" stroke="#f5a524" stroke-width="2"/><circle r="3" fill="#fff"/></g><text x="60" y="30" text-anchor="middle" font-size="11" fill="#9aa9bd">مكانه الحقيقي</text><text x="262" y="60" text-anchor="middle" font-size="11" fill="#f87171">أين يظهر</text><text x="160" y="176" text-anchor="middle" font-size="11" fill="#f5a524">فرق زاوية ثابت عن المقدمة</text></svg></div><h3 style="font-size:clamp(1rem,1.8vw,1.3rem)">٣ · الأهداف في اتجاه خاطئ</h3><p><b style="color:var(--red)">السبب المحتمل:</b> خط الاتجاه غير معايَر بعد التركيب.</p><p><b style="color:var(--green)">أول شيء تفحصه:</b> معايرة Heading Line على هدف معروف.</p></div>
+    </div>
+    <div class="note frag"><b>لاحظ:</b> أول عطلين غالبًا <b>إعدادات شاشة</b> لا عطل جهاز — لهذا نبدأ دائمًا بالشاشة قبل أي فك.</div>
+  </div>
+</section>
+
+<!-- ═══ 25c الأعطال ٢ ═══ -->
+<section class="slide" data-title="الأعطال الشائعة — ٢: أعطال التشغيل" data-ch="7" data-notes="القاعدة: الإعدادات ثم الطاقة ثم الكيبلات، والفك آخر شيء.">
+  <header><span class="k">١٥ <small>· ٢ من ٢</small></span><h2>الأعطال الشائعة — أعطال التشغيل</h2><span class="src">إضافة — الصيانة</span></header>
+  <div class="body">
+    <div class="cards">
+      <div class="card frag"><div class="ph" style="aspect-ratio:16/9"><svg viewBox="0 0 320 180" role="img"><rect width="320" height="180" fill="#06131f"/><rect x="156" y="95" width="8" height="60" fill="#6b86a3"/><rect x="90" y="80" width="140" height="16" rx="8" fill="#dbe7f1"/><path d="M110 60 a55 22 0 0 1 100 0" fill="none" stroke="#9aa9bd" stroke-width="3" stroke-dasharray="6 5"/><path d="M206 50 l6 12 l-13 1" fill="none" stroke="#9aa9bd" stroke-width="3"/><g stroke="#f87171" stroke-width="6" stroke-linecap="round"><line x1="140" y1="30" x2="180" y2="66"/><line x1="180" y1="30" x2="140" y2="66"/></g><text x="160" y="174" text-anchor="middle" font-size="11" fill="#9aa9bd">الهوائي واقف — لا مسح</text></svg></div><h3 style="font-size:clamp(1rem,1.8vw,1.3rem)">٤ · الهوائي لا يدور</h3><p><b style="color:var(--red)">السبب المحتمل:</b> الموتور، أو السير، أو الفيوز.</p><p><b style="color:var(--green)">أول شيء تفحصه:</b> الفيوز ← صوت الموتور ← السير.</p></div>
+      <div class="card frag"><div class="ph" style="aspect-ratio:16/9"><svg viewBox="0 0 320 180" role="img"><rect width="320" height="180" fill="#06131f"/><rect x="196" y="56" width="108" height="72" rx="8" fill="#04101a" stroke="#dbe7f1" stroke-width="2"/><text x="250" y="88" text-anchor="middle" font-size="13" font-weight="700" fill="#f87171" direction="ltr">NO</text><text x="250" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#f87171" direction="ltr">SCANNER</text><rect x="20" y="60" width="70" height="14" rx="7" fill="#ffcf6e"/><rect x="51" y="74" width="8" height="40" fill="#6b86a3"/><path d="M59 110 q40 30 70 0" fill="none" stroke="#38bdf8" stroke-width="4"/><path d="M150 100 q20 -20 46 -8" fill="none" stroke="#38bdf8" stroke-width="4"/><g stroke="#f87171" stroke-width="4" stroke-linecap="round"><line x1="132" y1="92" x2="146" y2="118"/><line x1="146" y1="92" x2="132" y2="118"/></g><text x="160" y="170" text-anchor="middle" font-size="11" fill="#9aa9bd">كيبل البيانات مقطوع أو موصله مبلول</text></svg></div><h3 style="font-size:clamp(1rem,1.8vw,1.3rem)">٥ · رسالة «No Scanner» أو لا اتصال</h3><p><b style="color:var(--red)">السبب المحتمل:</b> كيبل البيانات أو الموصل.</p><p><b style="color:var(--green)">أول شيء تفحصه:</b> الموصلان عند الهوائي وعند الشاشة (رطوبة، صدأ).</p></div>
+      <div class="card frag"><div class="ph" style="aspect-ratio:16/9"><svg viewBox="0 0 320 180" role="img"><rect width="320" height="180" fill="#06131f"/><rect x="186" y="40" width="118" height="80" rx="8" fill="#02080e" stroke="#46525f" stroke-width="2"/><text x="245" y="86" text-anchor="middle" font-size="12" fill="#46525f">شاشة مطفأة</text><rect x="20" y="70" width="70" height="40" rx="5" fill="#22354d" stroke="#f5a524"/><text x="55" y="95" text-anchor="middle" font-size="12" fill="#dbe7f1" direction="ltr">12/24 V</text><path d="M90 90 H120" stroke="#f87171" stroke-width="3"/><rect x="120" y="82" width="34" height="16" rx="4" fill="none" stroke="#ffcf6e" stroke-width="2"/><path d="M124 90 h9 m8 0 h9" stroke="#ffcf6e" stroke-width="2"/><text x="137" y="76" text-anchor="middle" font-size="10" fill="#ffcf6e">فيوز محترق</text><path d="M154 90 H186" stroke="#f87171" stroke-width="3" stroke-dasharray="4 5" opacity=".4"/><text x="160" y="166" text-anchor="middle" font-size="11" fill="#9aa9bd">لا كهرباء تصل للجهاز</text></svg></div><h3 style="font-size:clamp(1rem,1.8vw,1.3rem)">٦ · الجهاز لا يعمل إطلاقًا</h3><p><b style="color:var(--red)">السبب المحتمل:</b> الطاقة لا تصل.</p><p><b style="color:var(--green)">أول شيء تفحصه:</b> الفيوز ← الجهد 12/24 V ← القطبية.</p></div>
+    </div>
+    <div class="warn frag"><b>قاعدة الفني:</b> ابدأ بالأسهل والأرخص — <b>الإعدادات</b> ثم <b>الطاقة</b> ثم <b>الكيبلات</b> — والفك آخر شيء. أغلب البلاغات تنحل قبل ما تفتح الجهاز.</div>
+  </div>
+</section>
+
+<!-- ═══ 26 راجع معي ١ ═══ -->
+<section class="slide" data-title="راجع معي — ١" data-ch="7" data-notes="اسأل القاعة قبل إظهار كل جواب.">
+  <header><span class="k">★ <small>· ١ من ٢</small></span><h2>راجع معي — المبدأ والقطع</h2></header>
+  <div class="body">
+    <div class="qa">
+      <div class="q"><b>١ — ما معنى كلمة RADAR؟ وماذا يقيس الرادار أساسًا؟</b><span class="a frag">Radio Detection And Ranging — يقيس زمن عودة الصدى ليحسب المسافة، واتجاه الهوائي ليحدد الاتجاه.</span></div>
+      <div class="q"><b>٢ — لماذا نقسم على ٢ في معادلة المسافة؟</b><span class="a frag">لأن الزمن المقاس للذهاب والإياب معًا.</span></div>
+      <div class="q"><b>٣ — ما الوحدتان الرئيسيتان للرادار البحري، وأين تقع كل واحدة؟</b><span class="a frag">وحدة الهوائي (Scanner) فوق الزورق، ووحدة العرض (Display) في غرفة القيادة.</span></div>
+      <div class="q"><b>٤ — سمِّ القطع الست داخل رادار الماغنترون.</b><span class="a frag">الماغنترون · لوحة التعديل · لوحة IF · الهوائي · محرك الدوران · المحدد (الليمتر).</span></div>
+      <div class="q"><b>٥ — أي قطعة تمنع نبضة الإرسال من حرق المستقبل؟</b><span class="a frag">الدوبلكسر يعزل المستقبل لحظة الإرسال، والليمتر يقصّ ما يتسرّب.</span></div>
+      <div class="q"><b>٦ — الصورة على الشاشة تبهت تدريجيًا والأهداف البعيدة تختفي — ما أول المشتبه بهم؟</b><span class="a frag">الماغنترون انتهى عمره — قطعة تُستهلك وتُبدَّل.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 26b راجع معي ٢ ═══ -->
+<section class="slide" data-title="راجع معي — ٢" data-ch="7" data-notes="الجزء الثاني: الأنواع، النطاقات، السلامة، الشاشة.">
+  <header><span class="k">★ <small>· ٢ من ٢</small></span><h2>راجع معي — الأنواع والتشغيل</h2></header>
+  <div class="body two">
+    <div class="qa">
+      <div class="q"><b>٧ — الفرق الجوهري بين رادار الماغنترون والحالة الصلبة؟</b><span class="a frag">مصدر توليد الموجة: أنبوب مفرّغ مقابل ترانزستورات مع مضخّم — وكلاهما نبضي.</span></div>
+      <div class="q"><b>٨ — رادار يلوّن الأهداف المقتربة بالأحمر — ما نوعه؟</b><span class="a frag">حالة صلبة — دوبلر يحتاج إرسالًا متماسك الطور.</span></div>
+      <div class="q"><b>٩ — لماذا الزوارق الصغيرة على X-band؟</b><span class="a frag">هوائي صغير يكفيها، ودقة التفاصيل أهم من اختراق مطر نادر.</span></div>
+      <div class="q"><b>١٠ — ما أول شيء تفعله قبل لمس بورد المودوليتر؟</b><span class="a frag">تفريغ مكثفات الجهد العالي بأداة معزولة — وإبعاد الأدوات الحديدية عن المغناطيس.</span></div>
+      <div class="q"><b>١١ — مشغّل رفع Sea Clutter إلى الأقصى في ليلة موج — ما الخطر؟</b><span class="a frag">يمسح مع الموج أصداء القوارب الصغيرة القريبة — أخطر الأهداف.</span></div>
+      <div class="q"><b>١٢ — ما لون السلك الذي يذهب إلى الموجب؟ وأين يوضع الفيوز؟</b><span class="a frag">الأحمر إلى الموجب، الأسود إلى السالب — والفيوز على خط الموجب.</span></div>
+    </div>
+    <div>
+      <p class="lead" style="margin-bottom:.8rem">المحطات السبع — أين وصلنا:</p>
+      <div class="roadmap mini rm-auto" style="margin:0"></div>
+      <div class="photo frag" style="margin-top:1rem;aspect-ratio:16/8;max-height:34vh"><img src="media/scanner-open.jpg" alt=""><div class="cap">سؤال ختامي: سمِّ القطع الخمس الظاهرة في الصورة.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 27 الختام ═══ -->
+<section class="slide title-slide" data-title="الختام" data-ch="7" data-notes="اشكر الحضور وافتح باب الأسئلة.">
+  <img class="bgimg" src="media/bridge.jpg" alt="">
+  <div class="hero">
+    <img class="logo" src="media/logo.png" alt="">
+    <span class="tag">قسم الأجهزة الملاحية والرادار</span>
+    <h1>شكرًا لكم<br><span>أسئلتكم؟</span></h1>
+    <p class="sub">الفصل التالي: جهاز قياس الأعماق (Echo Sounder)</p>
+  </div>
+  <div class="hint"><span><span class="kbd">Home</span> العودة إلى البداية</span></div>
+</section>
+
+<!-- الشريط -->
+<div class="bar">
+  <button id="prev">‹ السابق</button>
+  <span class="cnt" id="cnt">1 / 41</span>
+  <span class="ttl" id="ttl"></span>
+  <div class="prog"><i id="prog"></i></div>
+  <button id="ovBtn" title="نظرة عامة (O)">▦</button>
+  <button id="pBtn" title="وضع المحاضر (P)">🗒</button>
+  <button id="next">التالي ›</button>
+  <button id="fs" title="ملء الشاشة (F)">⛶</button>
+</div>
+
+<!-- النظرة العامة -->
+<div class="overview" id="overview"><h2>كل الشرائح — اضغط للانتقال (O للإغلاق)</h2><div class="ov-grid" id="ovGrid"></div></div>
+</div>
+
+<script>
+/* ===== محرك العرض ===== */
+const DECK = (function () {
+  const slides = [...document.querySelectorAll('.slide')], N = slides.length;
+  const cnt = document.getElementById('cnt'), prog = document.getElementById('prog'), ttl = document.getElementById('ttl');
+  const CH = ['تمهيد', 'ما هو الرادار', 'المكوّنات', 'داخل الماغنترون', 'الحالة الصلبة', 'النطاقات والشعاع', 'التركيب والفك', 'الشاشة'];
+  let i = Math.min(N - 1, Math.max(0, (parseInt(location.hash.slice(1)) || 1) - 1));
+  const frags = s => [...s.querySelectorAll('.frag')];
+  const bc = ('BroadcastChannel' in window) ? new BroadcastChannel('radar-deck') : null;
+  function broadcast() { if (!bc) return; const s = slides[i], n = slides[i + 1]; bc.postMessage({ type: 'state', i, N, title: s.dataset.title, notes: s.dataset.notes || '', next: n ? n.dataset.title : '— النهاية —', ch: CH[+s.dataset.ch] || '' }); }
+  function roadmaps(k) { const ch = +slides[k].dataset.ch; document.querySelectorAll('.rm').forEach(r => { const c = +r.dataset.ch; r.classList.toggle('on', c === ch); r.classList.toggle('done', c < ch); }); }
+  function show(k, dir) {
+    slides.forEach((s, j) => { s.classList.toggle('active', j === k); s.classList.toggle('prev', j > k); });
+    const PRINT = location.search.includes('print');
+    frags(slides[k]).forEach(f => f.classList.toggle('show', PRINT || dir < 0));
+    i = k; cnt.textContent = (k + 1) + ' / ' + N; prog.style.width = ((k + 1) / N * 100) + '%'; ttl.textContent = slides[k].dataset.title || ''; history.replaceState(null, '', '#' + (k + 1));
+    roadmaps(k); broadcast();
+  }
+  function next() { const f = frags(slides[i]).find(x => !x.classList.contains('show')); if (f) { f.classList.add('show'); return; } if (i < N - 1) show(i + 1, 1); }
+  function prev() { const sh = frags(slides[i]).filter(x => x.classList.contains('show')); if (sh.length) { sh[sh.length - 1].classList.remove('show'); return; } if (i > 0) show(i - 1, -1); }
+  document.getElementById('next').onclick = next; document.getElementById('prev').onclick = prev;
+  document.getElementById('fs').onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  /* النظرة العامة */
+  const ov = document.getElementById('overview'), grid = document.getElementById('ovGrid');
+  slides.forEach((s, k) => { const img = s.querySelector('img:not(.logo)'); const d = document.createElement('div'); d.className = 'ov'; d.innerHTML = `<span class="num">${k + 1}</span><span class="t">${s.dataset.title}</span><span class="ch">${CH[+s.dataset.ch] || ''}</span>` + (img ? `<div class="th"><img src="${img.getAttribute('src')}" alt=""></div>` : ''); d.onclick = () => { toggleOv(false); show(k, 1); }; grid.appendChild(d); });
+  function toggleOv(force) { const open = force ?? !ov.classList.contains('open'); ov.classList.toggle('open', open); if (open) [...grid.children].forEach((c, k) => c.classList.toggle('cur', k === i)); }
+  document.getElementById('ovBtn').onclick = () => toggleOv();
+  /* وضع المحاضر */
+  let pw = null;
+  function openPresenter() {
+    if (pw && !pw.closed) { pw.focus(); broadcast(); return; }
+    pw = window.open('', 'radar-presenter', 'width=900,height=600');
+    if (!pw) { alert('المتصفح منع النافذة المنبثقة — اسمح بها ثم أعد المحاولة.'); return; }
+    pw.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>وضع المحاضر</title><style>
+      body{margin:0;background:#0b1220;color:#eef2f7;font-family:Vazirmatn,"Geeza Pro",Tahoma,sans-serif;display:grid;grid-template-rows:auto 1fr auto;height:100vh}
+      header{display:flex;gap:1rem;align-items:center;padding:.8rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.12);font-size:.95rem;color:#a5b3c6}
+      #timer{font-family:Changa,sans-serif;font-size:1.6rem;color:#ffcf6e;direction:ltr;margin-inline-start:auto}
+      main{display:grid;grid-template-columns:1.2fr 1fr;gap:1rem;padding:1.2rem;min-height:0}
+      .box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:1rem 1.2rem;overflow:auto}
+      .box h3{margin:0 0 .4rem;font-size:.85rem;color:#38bdf8;font-weight:500}
+      #cur{font-size:1.5rem;font-weight:600;line-height:1.4}#ch{color:#f5a524;font-size:.9rem}
+      #notes{font-size:1.15rem;line-height:1.8;color:#eef2f7}#next{font-size:1.1rem;color:#a5b3c6}
+      footer{display:flex;gap:.6rem;padding:.8rem 1.2rem;border-top:1px solid rgba(255,255,255,.12)}
+      button{font:inherit;font-size:1rem;background:#38bdf8;color:#06202e;border:0;border-radius:10px;padding:.5rem 1.2rem;cursor:pointer}
+      button.g{background:transparent;color:#eef2f7;border:1px solid rgba(255,255,255,.2)}
+    </style></head><body>
+      <header><span id="pos"></span><span id="ch"></span><span id="timer">00:00</span></header>
+      <main><div class="box"><h3>الشريحة الحالية</h3><div id="cur"></div><h3 style="margin-top:1rem">ملاحظات المحاضر</h3><div id="notes"></div></div>
+      <div class="box"><h3>التالي</h3><div id="next"></div><h3 style="margin-top:1.2rem">اختصارات</h3><div style="color:#a5b3c6;font-size:.9rem;line-height:1.8">← / مسافة: التالي · →: السابق — تُطبَّق على شاشة العرض مباشرة من هنا</div></div></main>
+      <footer><button id="p">‹ السابق</button><button id="n">التالي ›</button><button class="g" id="r">إعادة المؤقّت</button></footer>
+      <script>
+        const bc=new BroadcastChannel('radar-deck');let t0=Date.now();
+        bc.onmessage=e=>{const d=e.data;if(d.type!=='state')return;document.getElementById('pos').textContent=(d.i+1)+' / '+d.N;document.getElementById('ch').textContent=d.ch;document.getElementById('cur').textContent=d.title;document.getElementById('notes').textContent=d.notes||'—';document.getElementById('next').textContent=d.next;};
+        document.getElementById('n').onclick=()=>bc.postMessage({type:'cmd',cmd:'next'});document.getElementById('p').onclick=()=>bc.postMessage({type:'cmd',cmd:'prev'});document.getElementById('r').onclick=()=>t0=Date.now();
+        document.addEventListener('keydown',e=>{if(['ArrowLeft',' '].includes(e.key)){e.preventDefault();bc.postMessage({type:'cmd',cmd:'next'})}else if(e.key==='ArrowRight'){e.preventDefault();bc.postMessage({type:'cmd',cmd:'prev'})}});
+        setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);document.getElementById('timer').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')},500);
+        bc.postMessage({type:'hello'});
+      <\/script></body></html>`);
+    pw.document.close();
+  }
+  if (bc) bc.onmessage = e => { const d = e.data; if (d.type === 'cmd') { d.cmd === 'next' ? next() : prev(); broadcast(); } else if (d.type === 'hello') broadcast(); };
+  document.getElementById('pBtn').onclick = openPresenter;
+  /* لوحة المفاتيح */
+  document.addEventListener('keydown', e => {
+    if (e.target && e.target.matches && e.target.matches('input')) return;
+    const k = e.key.toLowerCase();
+    if (ov.classList.contains('open') && k !== 'o' && k !== 'escape') return;
+    if (['ArrowLeft', ' ', 'PageDown', 'Enter'].includes(e.key)) { e.preventDefault(); next(); }
+    else if (['ArrowRight', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') show(0, 1); else if (e.key === 'End') show(N - 1, -1);
+    else if (k === 'f') document.getElementById('fs').click();
+    else if (k === 'o' || k === 'escape') toggleOv(k === 'escape' ? false : undefined);
+    else if (k === 'p') openPresenter();
+    else if (k === 'g') { const n = parseInt(prompt('رقم الشريحة (1–' + N + ')')); if (n >= 1 && n <= N) show(n - 1, 1); }
+    broadcast();
+  });
+  let sx = null; document.addEventListener('touchstart', e => sx = e.touches[0].clientX, { passive: true });
+  document.addEventListener('touchend', e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 60) (dx > 0 ? next : prev)(); sx = null; broadcast(); });
+  document.getElementById('deck').addEventListener('click', e => { if (e.target.closest('.bar, a, button, input, label, .clickable, .panel, .bandsel, .hs-wrap, .overview')) return; next(); broadcast(); });
+  /* خرائط الفواصل */
+  const tpl = document.getElementById('roadmap-main');
+  document.querySelectorAll('.rm-auto').forEach(r => { r.innerHTML = tpl.innerHTML; });
+  show(i, 1);
+  return { next, prev, show };
+})();
+
+/* ===== إضاءة مخطط الكتل ===== */
+function bindHighlight(listId, svgId, noteId) {
+  const lis = document.querySelectorAll('#' + listId + ' li'), groups = document.querySelectorAll('#' + svgId + ' .hl');
+  lis.forEach(li => li.addEventListener('click', e => {
+    e.stopPropagation();
+    const on = li.classList.contains('on'); lis.forEach(x => x.classList.remove('on'));
+    if (on) { groups.forEach(g => { g.style.opacity = 1; g.style.filter = 'none'; }); if (noteId) document.getElementById(noteId).textContent = 'اضغط على أي مرحلة في القائمة.'; return; }
+    li.classList.add('on'); const keys = li.dataset.k.split(' ');
+    groups.forEach(g => { const on = keys.includes(g.dataset.k); g.style.opacity = on ? 1 : .15; g.style.filter = on ? 'drop-shadow(0 0 10px #ffcf6e)' : 'none'; });
+    if (noteId && li.dataset.n) document.getElementById(noteId).innerHTML = '<b>ملاحظة المحاضر:</b> ' + li.dataset.n;
+  }));
+}
+bindHighlight('list5', 'blk5'); bindHighlight('stages11', 'blk11', 'stageNote');
+/* أوضاع الإشارة: مرسلة / مستقبلة / كاملة */
+(function () {
+  const groups = { tx: ['mod','tx','dup','ant','tgt'], rx: ['tgt','ant','dup','rx','sp'], full: null };
+  const btns = document.querySelectorAll('.sig-m'); if (!btns.length) return;
+  const txP = document.getElementById('txPath'), rxP = document.getElementById('rxPath');
+  function setMode(m) {
+    btns.forEach(b => b.classList.toggle('ghost', b.dataset.m !== m));
+    ['Full','Tx','Rx'].forEach(k => { const g = document.getElementById('mode' + k); g.style.display = (k.toLowerCase() === m) ? '' : 'none'; if (k.toLowerCase() === m) { const c = g.cloneNode(true); g.replaceWith(c); } });
+    txP.style.opacity = (m === 'rx') ? .12 : .55; rxP.style.opacity = (m === 'tx') ? .12 : .55;
+    document.querySelectorAll('#list5 li').forEach(l => l.classList.remove('on'));
+    document.querySelectorAll('#blk5 .hl').forEach(g => { const on = !groups[m] || groups[m].includes(g.dataset.k); g.style.opacity = on ? 1 : .15; g.style.filter = (groups[m] && on) ? 'drop-shadow(0 0 10px #ffcf6e)' : 'none'; });
+  }
+  btns.forEach(b => b.addEventListener('click', e => { e.stopPropagation(); setMode(b.dataset.m); }));
+})();
+/* النقر على الرسم نفسه */
+document.querySelectorAll('#blk5 .blk').forEach(g => g.addEventListener('click', e => {
+  e.stopPropagation(); const k = g.dataset.k;
+  const li = [...document.querySelectorAll('#list5 li')].find(l => l.dataset.k.split(' ').includes(k));
+  if (li) li.click();
+}));
+
+/* ===== نقاط التوضيح ===== */
+(function () {
+  const parts = [
+    ['لوحة التعديل', 'Modulator Board', 'media/modulator.jpg', 'محوّل ومكثفات ومفتاح قدرة عالية — تعطي الماغنترون نبضة الجهد العالي في التوقيت الصحيح. المكثفات تحتفظ بجهد خطر بعد الإطفاء.'],
+    ['الماغنترون', 'Magnetron', 'media/magnetron.jpg', 'الأنبوب النحاسي المزعنف بالمنتصف: يحوّل نبضة الجهد العالي إلى موجة ميكروويف. محاط بمغناطيسات قوية — أبعد الأدوات الحديدية.'],
+    ['المحدد', 'Limiter', 'media/limiter.jpg', 'الكتلة المعدنية بنافذتها الزجاجية على مدخل الدليل الموجي: تحمي المستقبل من الأصداء القوية وتسرّب الإرسال.'],
+    ['محرك الدوران', 'Motor Drive', 'media/motor.jpg', 'الترس الأبيض أعلى المنتصف: يدوّر الهوائي بسرعة ثابتة ويرسل نبضة الاتجاه. الهوائي المشقوق يجلس فوقه (غير ظاهر هنا).'],
+    ['لوحة التردد المتوسط', 'IF Board', 'media/if-board.jpg', 'البورد الأيمن: يستقبل الصدى الضعيف ويحوّله لتردد متوسط ويضخّمه ويفلتره قبل المعالج.'],
+  ];
+  const hs = document.querySelectorAll('.hs'), T = document.getElementById('hsT'), P = document.getElementById('hsP'), IMG = document.getElementById('hsImg');
+  hs.forEach(b => b.addEventListener('click', e => { e.stopPropagation(); hs.forEach(x => x.classList.toggle('on', x === b)); const p = parts[+b.dataset.i]; T.innerHTML = p[0] + '<small>' + p[1] + '</small>'; P.textContent = p[3]; IMG.src = p[2]; }));
+})();
+
+/* ===== محاكاة النبضة ===== */
+(function () {
+  const pulse = document.getElementById('pulse'), echo = document.getElementById('echo'), target = document.getElementById('target');
+  const dist = document.getElementById('dist'), dLbl = document.getElementById('dLbl'), tOut = document.getElementById('tOut'), rOut = document.getElementById('rOut'), pOut = document.getElementById('pOut'), tlRx = document.getElementById('tline-rx'), tlLbl = document.getElementById('tline-lbl'), msg = document.getElementById('stageMsg');
+  const X_ANT = 574, X_MIN = 60; let loop = false, running = false;
+  const xOf = nm => X_ANT - (nm / 6) * (X_ANT - X_MIN);
+  function update() { const nm = +dist.value; dLbl.textContent = nm.toFixed(1) + ' nm'; const t = (nm * 1852 * 2 / 3e8) * 1e6; tOut.textContent = t.toFixed(1) + ' µs'; rOut.textContent = nm.toFixed(1) + ' nm'; const bars = Math.max(1, Math.round(4 - nm * .55)); pOut.textContent = '━'.repeat(bars) + '·'.repeat(4 - bars); target.setAttribute('transform', `translate(${xOf(nm)} 0)`); const tx = 596 - (t / 74) * 540; tlRx.setAttribute('x', tx); tlLbl.setAttribute('x', tx + 2); }
+  function fire() {
+    if (running) return; running = true; const nm = +dist.value, xt = xOf(nm), dur = 600 + nm * 250; msg.textContent = 'النبضة في الطريق…'; pulse.style.opacity = 1; echo.style.opacity = 0; const t0 = performance.now();
+    (function step(now) { const p = Math.min(1, (now - t0) / dur); if (p < .5) pulse.setAttribute('transform', `translate(${X_ANT - (X_ANT - xt) * (p / .5)} 150)`); else { pulse.style.opacity = 0; echo.style.opacity = 1; const q = (p - .5) / .5; echo.setAttribute('transform', `translate(${xt + (X_ANT - xt) * q} 150)`); if (q > .05) msg.textContent = 'انعكس! الصدى يعود أضعف…'; } if (p < 1) requestAnimationFrame(step); else { echo.style.opacity = 0; msg.textContent = `وصل الصدى بعد ${tOut.textContent} → المسافة ${rOut.textContent}`; running = false; if (loop) setTimeout(fire, 700); } })(t0);
+  }
+  dist.addEventListener('input', update); update();
+  document.getElementById('fire').addEventListener('click', fire);
+  document.getElementById('loop').addEventListener('click', e => { loop = !loop; e.target.textContent = loop ? '⏹ إيقاف' : '🔁 تكرار'; if (loop) fire(); });
+})();
+
+/* ===== الدوبلكسر ===== */
+(function () {
+  const arm = document.getElementById('arm'), gate = document.getElementById('gate'), modeLbl = document.getElementById('modeLbl'), dupMsg = document.getElementById('dupMsg'), limMsg = document.getElementById('limMsg');
+  const txp = document.getElementById('txp'), rxp = document.getElementById('rxp'), bigp = document.getElementById('bigp'); let busy = false, auto = false;
+  const P_TX = [[500, 65], [330, 65], [300, 95], [300, 150], [254, 150], [120, 150]], P_RX = [[120, 150], [254, 150], [300, 150], [300, 196], [330, 235], [400, 235], [470, 235], [500, 235]];
+  function setMode(tx) { arm.style.transform = tx ? 'rotate(0deg)' : 'rotate(180deg)'; gate.style.opacity = tx ? 1 : 0; modeLbl.textContent = tx ? 'إرسال' : 'استقبال'; dupMsg.textContent = tx ? 'وضع الإرسال: باب المستقبل مغلق ✕' : 'وضع الاستقبال: الطريق مفتوح للمستقبل'; }
+  function travel(el, path, dur, cb) { el.style.opacity = 1; const t0 = performance.now(), n = path.length - 1; (function step(now) { const p = Math.min(1, (now - t0) / dur), i = Math.min(n - 1, Math.floor(p * n)), q = p * n - i, [x1, y1] = path[i], [x2, y2] = path[i + 1]; el.setAttribute('transform', `translate(${x1 + (x2 - x1) * q} ${y1 + (y2 - y1) * q})`); if (p < 1) requestAnimationFrame(step); else { el.style.opacity = 0; cb && cb(); } })(t0); }
+  const doTx = cb => { if (busy) return; busy = true; setMode(true); setTimeout(() => travel(txp, P_TX, 1100, () => { busy = false; cb && cb(); }), 250); };
+  const doRx = cb => { if (busy) return; busy = true; setMode(false); limMsg.textContent = 'صدى عادي: يمرّ كما هو ✓'; setTimeout(() => travel(rxp, P_RX, 1500, () => { busy = false; cb && cb(); }), 250); };
+  const doBig = cb => { if (busy) return; busy = true; setMode(false); limMsg.textContent = 'صدى ضخم قادم…'; setTimeout(() => travel(bigp, P_RX.slice(0, 6), 1100, () => { limMsg.textContent = '✂ الليمتر قصّ القمة — المستقبل بأمان'; bigp.setAttribute('transform', 'translate(400 235)'); bigp.style.opacity = 1; setTimeout(() => { bigp.style.opacity = 0; travel(rxp, [[470, 235], [500, 235]], 400, () => { busy = false; cb && cb(); }); }, 500); }), 250); };
+  document.getElementById('dTx').onclick = () => doTx(); document.getElementById('dRx').onclick = () => doRx(); document.getElementById('dBig').onclick = () => doBig();
+  document.getElementById('dAuto').onclick = e => { auto = !auto; e.target.textContent = auto ? '⏹ إيقاف' : '▶ دورة تلقائية'; (function cycle() { if (!auto) return; doTx(() => setTimeout(() => doRx(() => setTimeout(() => doTx(() => setTimeout(() => doBig(() => setTimeout(cycle, 600)), 300)), 400)), 300)); })(); };
+  setMode(true);
+})();
+
+/* ===== النطاقات ===== */
+(function () {
+  const carrier = document.getElementById('carrier'), lamb = document.getElementById('lamb'), lambT = document.getElementById('lambT'), rainT = document.getElementById('rainT'), bandTitle = document.getElementById('bandTitle'), antRect = document.getElementById('antRect'), antT = document.getElementById('antT');
+  const info = { x: ['8–12 GHz', '2.5–3.75 cm', 'القوارب الصغيرة والمتوسطة', '#ffcf6e', 36, 'مطر: الموجة القصيرة تتبعثر وتضعف', 90, 'هوائي صغير (قبة أو ٤ أقدام)'], s: ['2–4 GHz', '7.5–15 cm', 'السفن الكبيرة — أفضل في الأجواء الصعبة', '#38bdf8', 120, 'مطر: الموجة الطويلة تعبر بسهولة', 240, 'هوائي كبير (٣–٤ أمتار)'] };
+  function draw(b) {
+    const [f, l, u, col, lam, rt, aw, at] = info[b]; let d = `M620 70`; for (let x = 620; x >= 20; x -= 2) d += ` L${x} ${70 - 26 * Math.sin((620 - x) / lam * 2 * Math.PI)}`;
+    carrier.setAttribute('d', d); carrier.setAttribute('stroke', col);
+    const a = 620 - lam, bb = 620 - 2 * lam; lamb.firstElementChild.setAttribute('x1', a); lamb.firstElementChild.setAttribute('x2', bb); lambT.setAttribute('x', (a + bb) / 2); lambT.textContent = 'λ ≈ ' + (b === 'x' ? '3 cm' : '10 cm');
+    rainT.textContent = rt; bandTitle.textContent = b === 'x' ? 'X-band' : 'S-band'; antRect.setAttribute('width', aw); antRect.setAttribute('x', 610 - aw); antT.textContent = at; antT.setAttribute('x', 610 - aw / 2);
+    document.getElementById('bF').textContent = f; document.getElementById('bL').textContent = l; document.getElementById('bU').textContent = u;
+  }
+  document.querySelectorAll('.bandsel button').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); document.querySelectorAll('.bandsel button').forEach(x => x.classList.toggle('on', x === btn)); draw(btn.dataset.b); }));
+  draw('x');
+})();
+
+/* ===== أشكال الإشارة (شريحة الموجات) ===== */
+(function () {
+  const svg = document.getElementById('wavesSvg'); if (!svg) return;
+  const rows = [['a', 'موجة مستمرة', (t) => Math.sin(t * 2 * Math.PI * 2.5)],
+    ['b', 'تتغير سرعتها (Chirp)', (t) => { const u = t % 1; return Math.sin(2 * Math.PI * (1.5 * u + 9 * u * u)); }],
+    ['c', 'بوابة تشغيل/إطفاء', (t) => { const u = t % 1; return (u > .28 && u < .55) || (u > .64 && u < .82) || (u > .91) ? 1 : -1; }],
+    ['d', 'الغلاف', (t) => { const u = t % 1; return (u > .28 && u < .55) ? Math.sin((u - .28) / .27 * Math.PI) * 2 - 1 : (u > .64 && u < .82) ? Math.sin((u - .64) / .18 * Math.PI) * 2 - 1 : (u > .91) ? Math.sin((u - .91) / .09 * Math.PI) * 2 - 1 : -1; }],
+    ['e', 'الناتج: نبضة ميكروويف', (t) => { const u = t % 1, on = (u > .28 && u < .55) || (u > .64 && u < .82) || (u > .91); return on ? Math.sin(2 * Math.PI * (1.5 * u + 9 * u * u)) : 0; }]];
+  let html = '';
+  rows.forEach((r, i) => {
+    const y0 = 40 + i * 72, h = 26; let d = '';
+    for (let x = 0; x <= 760; x += 2) { const t = x / 380; const v = r[2](t); d += (x ? ' L' : 'M') + (820 - x) + ' ' + (y0 - v * h); }
+    html += `<g class="hl wv" data-k="${r[0]}"><rect x="40" y="${y0 - 34}" width="800" height="68" rx="8" fill="rgba(255,255,255,.03)"/><line x1="60" y1="${y0}" x2="820" y2="${y0}" stroke="#3f6a8a"/><path d="${d}" fill="none" stroke="#38bdf8" stroke-width="2"/><text x="862" y="${y0 + 5}" text-anchor="middle" font-size="16" font-weight="700" fill="#ffcf6e" direction="ltr">${r[0]})</text><text x="60" y="${y0 - 20}" font-size="11" fill="#9aa9bd" text-anchor="start" style="direction:ltr">${r[1]}</text></g>`;
+  });
+  html += `<text x="440" y="392" text-anchor="middle" font-size="12" fill="#9aa9bd">الزمن ←  (رسم توضيحي — المقاييس ليست حقيقية)</text>`;
+  svg.innerHTML = html;
+  const lis = document.querySelectorAll('#wavesList li'), groups = svg.querySelectorAll('.wv');
+  lis.forEach(li => li.addEventListener('click', e => { e.stopPropagation(); const on = li.classList.contains('on'); lis.forEach(x => x.classList.remove('on')); if (on) { groups.forEach(g => { g.style.opacity = 1; g.style.filter = 'none'; }); return; } li.classList.add('on'); groups.forEach(g => { const on = g.dataset.k === li.dataset.k; g.style.opacity = on ? 1 : .15; g.style.filter = on ? 'drop-shadow(0 0 8px #ffcf6e)' : 'none'; }); }));
+})();
+
+
+/* ===== دوبلر متحرك ===== */
+(function () {
+  const btn = document.getElementById('dopBtn'); if (!btn) return;
+  const scene = document.getElementById('dopScene'), msg = document.getElementById('dopMsg'); let away = false;
+  btn.addEventListener('click', e => { e.stopPropagation(); away = !away;
+    scene.setAttribute('transform', away ? 'translate(640 0) scale(-1 1)' : '');
+    msg.textContent = away ? 'الهدف يبتعد عن الرادار — الموجات خلفه متباعدة ← الرادار يستقبل ترددًا أقل' : 'الهدف يقترب من الرادار — الموجات أمامه متقاربة ← الرادار يستقبل ترددًا أعلى';
+    msg.setAttribute('fill', away ? '#4ade80' : '#f87171');
+    btn.textContent = away ? '🔄 اجعله يقترب' : '🔄 اجعله يبتعد'; });
+})();
+
+/* ===== التركيب التفاعلي ===== */
+(function () {
+  const lis = document.querySelectorAll('#instList li'); if (!lis.length) return;
+  const hint = document.getElementById('inst-hint');
+  lis.forEach(li => li.addEventListener('click', e => { e.stopPropagation(); const n = +li.dataset.n; lis.forEach(x => x.classList.toggle('on', +x.dataset.n === n)); for (let k = 1; k <= 5; k++) document.getElementById('inst-' + k).style.opacity = k <= n ? 1 : 0; if (n >= 2) document.getElementById('inst-1').style.opacity = 0; hint.style.opacity = n >= 1 ? 0 : 1; }));
+})();
+
+/* ===== الفك التفاعلي ===== */
+(function () {
+  const lis = document.querySelectorAll('#disList li'); if (!lis.length) return;
+  const cover = document.getElementById('dis-cover'), screws = document.getElementById('dis-screws'), cables = document.getElementById('dis-cables'), inside = document.getElementById('dis-inside'), brush = document.getElementById('dis-brush'), pl = document.getElementById('dis-powerline'), pt = document.getElementById('dis-powerT'), msg = document.getElementById('dis-msg');
+  const msgs = ['', 'الطاقة مفصولة — انتظر دقائق ثم فرّغ المكثفات قبل اللمس', 'الكيبلات مفكوكة (صوّرتها؟)', 'البراغي خارج — احفظها في علبة', 'الغطاء مرفوع — ممنوع الإرسال والغطاء مفتوح', 'تنظيف بالفرشاة فقط — ثم أعد التركيب بالعكس'];
+  lis.forEach(li => li.addEventListener('click', e => {
+    e.stopPropagation(); const n = +li.dataset.n; lis.forEach(x => x.classList.toggle('on', +x.dataset.n === n));
+    pl.style.opacity = n >= 1 ? .15 : 1; pt.textContent = n >= 1 ? 'الطاقة مفصولة ✕' : 'الطاقة موصولة'; pt.setAttribute('fill', n >= 1 ? '#f87171' : '#4ade80');
+    cables.style.opacity = n >= 2 ? .15 : 1;
+    screws.style.transform = n >= 3 ? 'translateY(-60px)' : 'none'; screws.style.opacity = n >= 3 ? .35 : 1;
+    cover.style.transform = n >= 4 ? 'translate(0,-110px) rotate(-6deg)' : 'none'; inside.style.opacity = n >= 4 ? 1 : 0;
+    brush.style.opacity = n >= 5 ? 1 : 0; msg.textContent = msgs[n];
+  }));
+})();
+
+/* ===== أزرار شاشة الرادار ===== */
+document.querySelectorAll('.sc-t').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); const el = document.getElementById('sc-' + b.dataset.t); if (!el) return; const on = el.style.display === 'none'; el.style.display = on ? '' : 'none'; b.classList.toggle('ghost', !on); }));
+
+/* ===== شاشة الرادار التفاعلية ===== */
+(function () {
+  const gain = document.getElementById('gain'), sea = document.getElementById('sea'), noise = document.getElementById('noise'), seaC = document.getElementById('seaC'), weak = document.getElementById('weak'), near = document.getElementById('near'), st = document.getElementById('scopeSt'), msg = document.getElementById('scopeMsg');
+  const pts = []; for (let k = 0; k < 260; k++) { const a = Math.random() * Math.PI * 2, r = 20 + Math.random() * 115; pts.push([Math.cos(a) * r, Math.sin(a) * r, Math.random()]); }
+  const seaPts = []; for (let k = 0; k < 90; k++) { const a = Math.random() * Math.PI * 2, r = 8 + Math.random() * 40; seaPts.push([Math.cos(a) * r, Math.sin(a) * r, Math.random()]); }
+  function render() {
+    const g = +gain.value, s = +sea.value; document.getElementById('gL').textContent = g; document.getElementById('sL').textContent = s; st.textContent = `GAIN ${g} · SEA ${s}`;
+    const nThr = 1 - Math.max(0, g - 55) / 45; noise.innerHTML = pts.filter(p => p[2] > nThr).map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="1.6" fill="#4ade80" opacity=".6"/>`).join('');
+    const sThr = s / 100; seaC.innerHTML = seaPts.filter(p => p[2] > sThr && g > 15).map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="2" fill="#4ade80" opacity=".8"/>`).join('');
+    weak.style.opacity = g >= 45 ? 1 : 0; near.style.opacity = s <= 65 && g > 15 ? 1 : 0; document.getElementById('tgts').style.opacity = g > 15 ? 1 : .15;
+    msg.textContent = g < 20 ? 'Gain منخفض جدًا: الأهداف تختفي' : g > 80 ? 'Gain مرتفع جدًا: «ثلج» يغطي الشاشة' : s > 65 ? '⚠ Sea Clutter مرتفع: اختفى القارب الصغير القريب من المركز!' : g < 45 ? 'الهدف الضعيف البعيد لا يظهر — ارفع Gain قليلًا' : '✓ إعداد جيد: أهداف واضحة وثلج خفيف';
+  }
+  gain.addEventListener('input', render); sea.addEventListener('input', render); render();
+})();
+if(location.search.includes('check')) setTimeout(function(){ const out=[]; document.querySelectorAll('.slide').forEach((s,k)=>{ s.classList.add('active'); s.querySelectorAll('.frag').forEach(f=>f.classList.add('show')); const b=s.querySelector('.body')||s.querySelector('.hero'); const o=b?b.scrollHeight-b.clientHeight:0; if(o>4) out.push((k+1)+':'+o); s.classList.remove('active'); }); const p=document.createElement('pre'); p.id='ovr'; p.textContent='OVR['+out.join(',')+']'; document.body.appendChild(p); }, 1500);
+</script>
+</body>
+</html>
