@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>أسئلة المراجعة — الرادار و GPS</title>
+<link href="https://fonts.googleapis.com/css2?family=Changa:wght@600;800&family=Vazirmatn:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#f6f1e8;--card:#fffdf9;--ink:#1c2530;--dim:#55606d;--line:rgba(28,37,48,.16);--amber:#c97a12;--amber2:#f5a524;--cyan:#0e7490;--green:#1f8a4c;--navy:#14304f}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:"Vazirmatn","Geeza Pro",Tahoma,sans-serif;line-height:1.8;font-size:1.02rem;padding:clamp(1rem,3vw,2.2rem) 1rem 3rem}
+  h1,h2,h3{font-family:"Changa","Geeza Pro",sans-serif;line-height:1.3}
+  .wrap{max-width:900px;margin:0 auto}
+  .kicker{color:var(--cyan);font-weight:600;font-size:.9rem}
+  h1{font-size:clamp(1.5rem,4.5vw,2.1rem);font-weight:800;margin:.2rem 0 .3rem}
+  .sub{color:var(--dim);max-width:76ch;font-size:.97rem}
+  .bar{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0 1.4rem}
+  .bar button{font-family:"Vazirmatn",sans-serif;font-size:.9rem;font-weight:600;padding:.4rem .9rem;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+  .bar button.on{background:var(--navy);color:#fff;border-color:transparent}
+  .part{margin-top:1.8rem}
+  .part>h2{font-size:1.3rem;font-weight:800;color:#fff;background:var(--navy);padding:.4rem 1rem;border-radius:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .part>h2 small{font-family:"Vazirmatn",sans-serif;font-weight:400;font-size:.8rem;opacity:.85}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:.7rem 1rem;margin:.65rem 0;break-inside:avoid}
+  .q .t{font-weight:600}
+  .q .t .n{display:inline-grid;place-items:center;width:1.8rem;height:1.8rem;border-radius:50%;background:var(--amber2);color:#0b1220;font-size:.85rem;margin-inline-end:.5rem;vertical-align:middle;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .a{margin-top:.4rem;padding:.4rem .8rem;border-radius:9px;background:rgba(31,138,76,.08);border:1px solid rgba(31,138,76,.3);font-size:.97rem}
+  .a::before{content:"الإجابة: ";font-family:"Changa",sans-serif;color:var(--green);font-weight:700}
+  body.hide .a{display:none}
+  .extra{background:rgba(245,165,36,.1);border:1px solid rgba(245,165,36,.45);border-radius:12px;padding:.6rem 1rem;margin:.8rem 0;font-size:.97rem}
+  .extra b{color:var(--amber)}
+  .note{background:rgba(14,116,144,.07);border:1px solid rgba(14,116,144,.3);border-radius:12px;padding:.7rem 1.05rem;margin:1.2rem 0;font-size:.94rem}
+  .note b{color:var(--cyan)}
+  footer{margin-top:2rem;color:var(--dim);font-size:.82rem;border-top:1px solid var(--line);padding-top:.8rem}
+  @page{size:A4;margin:12mm}
+  @media print{body{background:#fff;padding:0;font-size:10.5pt}.bar,.note{display:none}.q{break-inside:avoid}.part{break-before:page}.part:first-of-type{break-before:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">دورة الأجهزة الملاحية · بنك أسئلة المراجعة</p>
+  <h1>أسئلة المراجعة — الرادار و GPS</h1>
+  <p class="sub">٢٤ سؤالاً بإجاباتها (١٢ للرادار و١٢ للـ GPS). نُقلت من العرضين إلى هذه الصفحة لتُستخدم في الاختبار النظري أو كمراجعة سريعة.</p>
+
+  <div class="bar">
+    <button id="tgl" class="on">إخفاء الإجابات</button>
+    <button onclick="window.print()">طباعة</button>
+  </div>
+
+  <section class="part">
+    <h2>📡 الرادار <small>— ١٢ سؤالاً</small></h2>
+
+    <div class="q"><div class="t"><span class="n">١</span>ما معنى كلمة RADAR؟ وماذا يقيس الرادار أساساً؟</div>
+      <div class="a">Radio Detection And Ranging — يقيس زمن عودة الصدى ليحسب المسافة، واتجاه الهوائي ليحدد الاتجاه.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٢</span>لماذا نقسم على ٢ في معادلة المسافة؟</div>
+      <div class="a">لأن الزمن المقاس للذهاب والإياب معاً.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٣</span>ما الوحدتان الرئيسيتان للرادار البحري، وأين تقع كل واحدة؟</div>
+      <div class="a">وحدة الهوائي (Scanner) فوق الزورق، ووحدة العرض (Display) في غرفة القيادة.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٤</span>سمِّ القطع الست داخل رادار الماغنترون.</div>
+      <div class="a">الماغنترون · لوحة التعديل (المودوليتر) · لوحة IF · الهوائي · محرك الدوران · المحدد (الليمتر).</div></div>
+
+    <div class="q"><div class="t"><span class="n">٥</span>أي قطعة تمنع نبضة الإرسال من حرق المستقبل؟</div>
+      <div class="a">الدوبلكسر يعزل المستقبل لحظة الإرسال، والليمتر يقصّ ما يتسرّب.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٦</span>الصورة على الشاشة تبهت تدريجياً والأهداف البعيدة تختفي — ما أول المشتبه بهم؟</div>
+      <div class="a">الماغنترون انتهى عمره — قطعة تُستهلك وتُبدَّل.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٧</span>الفرق الجوهري بين رادار الماغنترون والحالة الصلبة؟</div>
+      <div class="a">مصدر توليد الموجة: أنبوب مفرّغ مقابل ترانزستورات مع مضخّم — وكلاهما نبضي.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٨</span>رادار يلوّن الأهداف المقتربة بالأحمر — ما نوعه؟</div>
+      <div class="a">حالة صلبة — دوبلر يحتاج إرسالاً متماسك الطور.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٩</span>لماذا الزوارق الصغيرة على X-band؟</div>
+      <div class="a">هوائي صغير يكفيها، ودقة التفاصيل أهم من اختراق مطر نادر.</div></div>
+
+    <div class="q"><div class="t"><span class="n">١٠</span>ما أول شيء تفعله قبل لمس بورد المودوليتر؟</div>
+      <div class="a">تفريغ مكثفات الجهد العالي بأداة معزولة — وإبعاد الأدوات الحديدية عن المغناطيس.</div></div>
+
+    <div class="q"><div class="t"><span class="n">١١</span>مشغّل رفع Sea Clutter إلى الأقصى في ليلة موج — ما الخطر؟</div>
+      <div class="a">يمسح مع الموج أصداء القوارب الصغيرة القريبة — أخطر الأهداف.</div></div>
+
+    <div class="q"><div class="t"><span class="n">١٢</span>ما لون السلك الذي يذهب إلى الموجب؟ وأين يوضع الفيوز؟</div>
+      <div class="a">الأحمر إلى الموجب، الأسود إلى السالب — والفيوز على خط الموجب.</div></div>
+
+    <div class="extra"><b>سؤال عملي ختامي:</b> اعرض عليهم صورة رادوم مفتوح واطلب تسمية القطع الخمس الظاهرة.</div>
+  </section>
+
+  <section class="part">
+    <h2>🛰️ GPS <small>— ١٢ سؤالاً</small></h2>
+
+    <div class="q"><div class="t"><span class="n">١</span>هل يحتاج الـ GPS إلى إنترنت؟ وهل يرسل شيئاً للأقمار؟</div>
+      <div class="a">لا ولا — يستقبل فقط، ويعمل ٢٤ ساعة بلا إنترنت ولا اشتراك.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٢</span>كم قمراً يحتاج الجهاز حداً أدنى؟ ولماذا؟</div>
+      <div class="a">أربعة — ثلاثة للموقع والرابع لتصحيح ساعة الجهاز غير الذرية.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٣</span>كيف يعرف الجهاز بُعده عن القمر؟</div>
+      <div class="a">يقيس زمن وصول الإشارة ويضربه في سرعة الضوء.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٤</span>ما الصيغة البحرية للإحداثيات؟ وأيهما يُقال أولاً؟</div>
+      <div class="a">درجات ودقائق (DDM) — العرض أولاً ثم الطول.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٥</span>الموقع منزاح ٣٠٠ متر عن الخريطة بشكل ثابت. ما أول شيء تفحصه؟</div>
+      <div class="a">إعداد الدَاتُم — يجب أن يكون WGS84.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٦</span>هل المطر الغزير يوقف الـ GPS؟</div>
+      <div class="a">لا — الذي يوقفه حاجب مادي فوق الهوائي أو كيبل تالف أو تشويش.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٧</span>ما ميزة الـ GPS المستقل على المدمج في 3 in 1؟</div>
+      <div class="a">يبقى يعمل لو تعطلت الشاشة المشتركة — احتياط، وأسهل تبديلاً.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٨</span>ما أهم زر في الجهاز لخفر السواحل؟ ومن يجب أن يعرف مكانه؟</div>
+      <div class="a">زر MOB — كل فرد في الدورية.</div></div>
+
+    <div class="q"><div class="t"><span class="n">٩</span>الـ VHF أرسل نداء استغاثة بلا موقع. ما السبب المحتمل؟</div>
+      <div class="a">كيبل NMEA مفصول أو مخرج البيانات مغلق في الـ GPS.</div></div>
+
+    <div class="q"><div class="t"><span class="n">١٠</span>جهاز جديد رُكّب للتو ولا يعطي موقعاً. هل هو عطلان؟</div>
+      <div class="a">لا — إقلاع بارد: انتظر ٥ إلى ١٥ دقيقة في مكان مكشوف.</div></div>
+
+    <div class="q"><div class="t"><span class="n">١١</span>شاشة الأقمار تعرض صفر أقمار بعد الانتظار. أين تبحث؟</div>
+      <div class="a">الهوائي وكيبله: حاجب فوقه، موصل مبلول، ثني أو قطع.</div></div>
+
+    <div class="q"><div class="t"><span class="n">١٢</span>موقعك ظهر فجأة داخل المطار وسرعتك ٢٠٠ عقدة. ماذا تفعل؟</div>
+      <div class="a">انتحال أو تشويش — ارجع للرادار والبوصلة والمعالم وبلّغ العمليات.</div></div>
+
+    <div class="extra"><b>سؤال عملي ختامي:</b> اعرض عليهم صورة جهاز GPS وأجزائه واطلب تسمية كل قطعة ووظيفتها.</div>
+  </section>
+
+  <div class="note"><b>للاستخدام في الاختبار:</b> اضغط «إخفاء الإجابات» ثم «طباعة» فتحصل على ورقة أسئلة بلا حلول للموظفين. واطبعها مرة ثانية بالإجابات ظاهرة لتكون نموذج التصحيح عندك.</div>
+
+  <footer>دورة الأجهزة الملاحية — خفر السواحل · بنك أسئلة المراجعة (نُقلت من العرضين)</footer>
+</div>
+<script>
+  var b=document.getElementById('tgl');
+  b.addEventListener('click',function(){
+    document.body.classList.toggle('hide');
+    var h=document.body.classList.contains('hide');
+    b.textContent=h?'إظهار الإجابات':'إخفاء الإجابات'; b.classList.toggle('on',!h);
+  });
+</script>
+</body>
+</html>
