@@ -1050,7 +1050,7 @@
 </section>
 
 <!-- ═══ 25 الشاشة ═══ -->
-<section class="slide" data-title="شاشة الرادار — الإعدادات" data-ch="7" data-notes="جرّب Sea Clutter إلى الأقصى: يختفي القارب الصغير القريب. هذي لحظة «آها» للمشغّل.">
+<section class="slide" data-title="شاشة الرادار — الإعدادات" data-ch="7" data-notes="ابدأ بزر الانتظار Standby: الشاشة شغّالة لكن بلا أهداف ولا دوران — هذا أول عطل في قائمة الأعطال. ثم اضغط إرسال TX وجرّب Sea Clutter إلى الأقصى: يختفي القارب الصغير القريب. هذي لحظة «آها» للمشغّل.">
   <header><span class="k">١٤</span><h2>شاشة الرادار (Display) — أهم الخيارات</h2><span class="src">الشريحة ٢٢</span></header>
   <div class="body two wide">
     <div class="panel">
@@ -1066,9 +1066,10 @@
           <g id="sc-ebl" style="display:none"><line x1="0" y1="0" x2="60" y2="-50" stroke="#ffcf6e" stroke-width="1.5" stroke-dasharray="6 4"/><circle r="78" fill="none" stroke="#ffcf6e" stroke-width="1.5" stroke-dasharray="6 4"/><text x="70" y="-60" font-size="11" fill="#ffcf6e" direction="ltr">EBL 050°</text><text x="-30" y="-84" font-size="11" fill="#ffcf6e" direction="ltr">VRM 3.5 nm</text></g>
           <circle r="4" fill="#fff"/>
         </g>
-        <g font-size="12" fill="#4ade80" direction="ltr"><text x="628" y="20" text-anchor="end">RANGE 6 nm</text><text x="12" y="20">TX</text><text x="628" y="288" text-anchor="end" id="scopeSt">GAIN 50 · SEA 20</text></g>
-        <text x="320" y="288" text-anchor="middle" font-size="12" fill="#ffcf6e" id="scopeMsg"></text>
+        <g font-size="12" fill="#4ade80" direction="ltr"><text x="628" y="20" text-anchor="end">RANGE 6 nm</text><text x="12" y="20" id="txLbl">TX</text><text x="628" y="288" text-anchor="end" id="scopeSt">GAIN 50 · SEA 20</text></g>
+        <text x="320" y="156" text-anchor="middle" font-size="26" font-weight="700" fill="#ffcf6e" id="sbBig" style="display:none" direction="ltr">STANDBY</text><text x="320" y="178" text-anchor="middle" font-size="12" fill="#9aa9bd" id="sbSub" style="display:none">الهوائي متوقف — لا إرسال</text><text x="320" y="288" text-anchor="middle" font-size="12" fill="#ffcf6e" id="scopeMsg"></text>
       </svg>
+      <div class="ctrls" style="gap:.4rem"><button class="btn" id="txBtn" style="background:#1f8a4c;color:#fff;border-color:transparent">📡 إرسال TX</button><button class="btn ghost" id="sbBtn">⏸ انتظار Standby</button></div>
       <div class="ctrls" style="gap:.4rem"><button class="btn sc-t" data-t="rings">حلقات المسافة</button><button class="btn ghost sc-t" data-t="ebl">EBL / VRM</button><button class="btn ghost sc-t" data-t="trails">الأثر</button><button class="btn ghost sc-t" data-t="guard">منطقة الحراسة</button></div>
       <div class="ctrls"><label class="slider">الحساسية Gain: <span id="gL">50</span><input type="range" id="gain" min="0" max="100" value="50"></label><label class="slider">تشويش البحر Sea Clutter: <span id="sL">20</span><input type="range" id="sea" min="0" max="100" value="20"></label></div>
     </div>
@@ -1419,9 +1420,32 @@ document.querySelectorAll('.sc-t').forEach(b => b.addEventListener('click', e =>
     const nThr = 1 - Math.max(0, g - 55) / 45; noise.innerHTML = pts.filter(p => p[2] > nThr).map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="1.6" fill="#4ade80" opacity=".6"/>`).join('');
     const sThr = s / 100; seaC.innerHTML = seaPts.filter(p => p[2] > sThr && g > 15).map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="2" fill="#4ade80" opacity=".8"/>`).join('');
     weak.style.opacity = g >= 45 ? 1 : 0; near.style.opacity = s <= 65 && g > 15 ? 1 : 0; document.getElementById('tgts').style.opacity = g > 15 ? 1 : .15;
+    if (typeof tx !== 'undefined' && !tx) { msg.textContent = 'وضع الانتظار: الهوائي متوقف ولا يوجد إرسال — الشاشة شغّالة لكن بلا أهداف'; return; }
     msg.textContent = g < 20 ? 'Gain منخفض جدًا: الأهداف تختفي' : g > 80 ? 'Gain مرتفع جدًا: «ثلج» يغطي الشاشة' : s > 65 ? '⚠ Sea Clutter مرتفع: اختفى القارب الصغير القريب من المركز!' : g < 45 ? 'الهدف الضعيف البعيد لا يظهر — ارفع Gain قليلًا' : '✓ إعداد جيد: أهداف واضحة وثلج خفيف';
   }
+  // ── الإرسال / الانتظار ──
+  const txBtn = document.getElementById('txBtn'), sbBtn = document.getElementById('sbBtn');
+  const sbBig = document.getElementById('sbBig'), sbSub = document.getElementById('sbSub'), txLbl = document.getElementById('txLbl');
+  const sweepEl = document.querySelector('#scope .sweep');
+  const hideInStandby = ['tgts', 'noise', 'seaC', 'sc-trails'];
+  let tx = true;
+  function setTx(on) {
+    tx = on;
+    if (sweepEl) { sweepEl.style.animationPlayState = on ? 'running' : 'paused'; sweepEl.style.opacity = on ? 1 : 0; }
+    hideInStandby.forEach(id => { const el = document.getElementById(id); if (el) el.style.visibility = on ? 'visible' : 'hidden'; });
+    sbBig.style.display = on ? 'none' : ''; sbSub.style.display = on ? 'none' : '';
+    txLbl.textContent = on ? 'TX' : 'STANDBY'; txLbl.setAttribute('fill', on ? '#4ade80' : '#ffcf6e');
+    txBtn.classList.toggle('ghost', !on); sbBtn.classList.toggle('ghost', on);
+    txBtn.style.background = on ? '#1f8a4c' : ''; txBtn.style.color = on ? '#fff' : ''; txBtn.style.borderColor = on ? 'transparent' : '';
+    sbBtn.style.background = on ? '' : '#c97a12'; sbBtn.style.color = on ? '' : '#fff'; sbBtn.style.borderColor = on ? '' : 'transparent';
+    [gain, sea].forEach(x => x.disabled = !on);
+    render();
+  }
+  txBtn.addEventListener('click', e => { e.stopPropagation(); setTx(true); });
+  sbBtn.addEventListener('click', e => { e.stopPropagation(); setTx(false); });
+
   gain.addEventListener('input', render); sea.addEventListener('input', render); render();
+  if (location.search.includes('sb=1')) setTx(false);
 })();
 if(location.search.includes('check')) setTimeout(function(){ const out=[]; document.querySelectorAll('.slide').forEach((s,k)=>{ s.classList.add('active'); s.querySelectorAll('.frag').forEach(f=>f.classList.add('show')); const b=s.querySelector('.body')||s.querySelector('.hero'); const o=b?b.scrollHeight-b.clientHeight:0; if(o>4) out.push((k+1)+':'+o); s.classList.remove('active'); }); const p=document.createElement('pre'); p.id='ovr'; p.textContent='OVR['+out.join(',')+']'; document.body.appendChild(p); }, 1500);
 </script>
